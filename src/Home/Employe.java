@@ -6,6 +6,7 @@ import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.*;
+import java.util.ArrayList;
 
 public class Employe {
     public JPanel MainEmploye;
@@ -79,22 +80,22 @@ public class Employe {
                 password = pwdEmp.getPassword().toString().trim();
                 salaire = salEmp.getText().trim();
 
-                if(ChampEstVide(nom,prenom,adresse,mail,password,salaire) == true)
+                if(ChampEstVide(nom, prenom, adresse, mail, password, salaire))
                 {
                     JOptionPane.showMessageDialog(null, "Verifiez Les Champs !!");
                     nomEmp.requestFocus();
                 }
                 else
                 {
-                    if(!MailEstUnique(mail))
+                    if(!MailEstUnique(mail) || !valideMail(mail))
                     {
-                        JOptionPane.showMessageDialog(null, "L'employé Déjà Existe !!");
+                        JOptionPane.showMessageDialog(null, "L'employé Déjà Existe ou  mail invalide");
                         mailEmp.setText("");
                         mailEmp.requestFocus();
                     }
                     else
                     {
-                        if(ChampSalaireEstDouble(salaire) == false)
+                        if(!ChampSalaireEstDouble(salaire))
                         {
                             JOptionPane.showMessageDialog(null, "Verifiez Le salaire !!");
                             salEmp.setText("");
@@ -170,7 +171,6 @@ public class Employe {
                         ex.printStackTrace();
                     }
                 }
-
             }
         });
     }
@@ -232,26 +232,26 @@ public class Employe {
     }
 
 
-    //--------------- mail unique et chargement ---------------
+    //-------------------- mail unique et chargement -------------------
     public boolean MailEstUnique(String inputMail)
     {
-        String [] tabmail = new String[0];
+        ArrayList listmail = new ArrayList();
         try
         {
             pst = con.prepareStatement("select mail from employe");
             ResultSet rs = pst.executeQuery();
-            int i = 0;
+
             //empiler tabmail avec les mail à partir de la base de donnée
             while(rs.next())
             {
-                tabmail[i] = rs.getString(4);
-                i++;
+                listmail.add(rs.getString("mail"));
             }
+            System.out.println(listmail);
             //table1.setModel(DbUtils.resultSetToTableModel(rs));
 
-            for(int j=0; j<tabmail.length;j++)
+            for(int j=0; j<listmail.size();j++)
             {
-                if(inputMail.equals(tabmail[j]))
+                if(inputMail.equals(listmail.get(j)))
                 {
                     return false;
                 }
@@ -265,5 +265,36 @@ public class Employe {
         return true;
     }
 
+    //----------------------- mail form ---------------------------
+    public boolean valideMail(String inputMail)
+    {
+        if(inputMail.indexOf('@') != -1 && inputMail.indexOf('.') != -1)
+        {
+            int indiceAlt= inputMail.indexOf('@');
+            String login = inputMail.substring(0,indiceAlt);
+            String domain = inputMail.substring(indiceAlt,inputMail.lastIndexOf('.'));
+            String ext = inputMail.substring(inputMail.lastIndexOf('.')+1);
+
+            if(login.length()<2)
+            {
+                return false;
+            }
+
+            if(domain.length() <1)
+            {
+                return false;
+            }
+
+            if(ext.length() <2 || ext.length() > 3)
+            {
+                return false ;
+            }
+        }
+        else
+        {
+            return false;
+        }
+        return true ;
+    }
 
 }
