@@ -24,6 +24,7 @@ public class Employe {
     private JTextField mailEmp;
     private JTextField salEmp;
     private JLabel currentUser;
+    private JButton confBtn;
     Connection con;
     PreparedStatement pst;
 
@@ -34,6 +35,9 @@ public class Employe {
         connect();
         AjouterEmploye();
         Rechercher();
+        Supprimer();
+
+
     }
 
 
@@ -175,8 +179,131 @@ public class Employe {
         });
     }
 
+    //---------------------SUPPRIMER EMPLOYE----------------------------------
+    public void Supprimer()//les admins ne peuvent pas etre supprimés
+    {
+        SuppBtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String id=inputEmp.getText();
+                if(ChampsIdEstInt(id)==false || IdExist(id)==false)
+                {
+                    JOptionPane.showMessageDialog(null, "Impossible De Supprimer");
+                    inputEmp.setText("");
+                    inputEmp.requestFocus();
+                }
+                else
+                {
+                    try
+                    {
+                        pst = con.prepareStatement("delete from employe where idemp = ?");
+                        pst.setString(1, id);
+                        pst.executeUpdate();
+                        JOptionPane.showMessageDialog(null, "Employé Supprimé !!");
+                        Actualiser();
+                        inputEmp.setText("");
+                        inputEmp.requestFocus();
+                    }
+                    catch (SQLException e1)
+                    {
+                        e1.printStackTrace();
+                    }
+                }
+            }
+        });
+    }
 
+    //----------------------------id chiffres-----------------------------
+    public boolean ChampsIdEstInt(String champsId)
+    {
+        boolean b = false ;
+        try
+        {
+            Integer.parseInt(champsId);
+            b = true;
+        }
+        catch(NumberFormatException e)
+        {
+            b = false;
+        }
+        return b;
+    }
 
+    //--------------------------id exist---------------------------------
+    public boolean IdExist(String id)
+    {
+        ArrayList listid = new ArrayList();
+        try
+        {
+            pst = con.prepareStatement("select idemp from employe");
+            ResultSet rs = pst.executeQuery();
+
+            //empiler tabid avec les id à partir de la base de donnée
+            while(rs.next())
+            {
+                listid.add(rs.getString("idemp"));
+            }
+            System.out.println(listid);
+            //table1.setModel(DbUtils.resultSetToTableModel(rs));
+
+            for(int j=0; j<listid.size();j++)
+            {
+                if(id.equals(listid.get(j)))
+                {
+                    return true;
+                }
+            }
+
+        }
+        catch (SQLException e)
+        {
+            e.printStackTrace();
+        }
+        return false;
+    }
+    //-----------------UPDATE EMPLOYE-------------------------------
+    public void Modifier()
+    {
+        modBtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String [] tabpst= new String[3];
+                String nom,prenom,adresse,mail,post,password,salaire;
+                nom = nomEmp.getText().trim();
+                prenom = preEmp.getText().trim();
+                adresse = addEmp.getText().trim();
+                mail = mailEmp.getText().trim();
+                post = tabpst[PostEmp.getSelectedIndex()];
+                password = pwdEmp.getPassword().toString().trim();
+                salaire = salEmp.getText().trim();
+
+                String id=inputEmp.getText();
+                if(ChampsIdEstInt(id)==false || IdExist(id)==false)
+                {
+                    JOptionPane.showMessageDialog(null, "Impossible De Supprimer");
+                    inputEmp.setText("");
+                    inputEmp.requestFocus();
+                }
+                else
+                {
+                    try
+                    {
+                        pst = con.prepareStatement("delete from employe where idemp = ?");
+                        pst.setString(1, id);
+                        pst.executeUpdate();
+                        JOptionPane.showMessageDialog(null, "Employé Supprimé !!");
+                        Actualiser();
+                        inputEmp.setText("");
+                        inputEmp.requestFocus();
+                    }
+                    catch (SQLException e1)
+                    {
+                        e1.printStackTrace();
+                    }
+                }
+            }
+        });
+    }
 
     //---------------------- chargement du tableau -----------------------------
     public void Actualiser()
