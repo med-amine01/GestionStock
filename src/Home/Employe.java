@@ -79,7 +79,7 @@ public class Employe {
                 password = pwdEmp.getPassword().toString().trim();
                 salaire = salEmp.getText().trim();
 
-                if(ChampEstVide(nom,prenom,adresse,mail,password,salaire) == true)
+                if(!ChampEstVide(nom,prenom,adresse,mail,password,salaire))
                 {
                     JOptionPane.showMessageDialog(null, "Verifiez Les Champs !!");
                     nomEmp.requestFocus();
@@ -186,10 +186,6 @@ public class Employe {
                 b = true;
                 break;
             }
-            else
-            {
-                b = false;
-            }
         }
         return b;
     }
@@ -197,7 +193,7 @@ public class Employe {
     //------------------------- verification champ salaire ----------------------
     public boolean ChampSalaireEstDouble(String salaire)
     {
-        boolean b = false ;
+        boolean b  ;
         try
         {
             Double.parseDouble(salaire);
