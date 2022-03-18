@@ -23,8 +23,8 @@ public class Employe {
     private JTextField mailEmp;
     private JTextField salEmp;
     private JLabel currentUser;
-    Connection con;
-    PreparedStatement pst;
+    Connection con; //variable pour connecté et utilisé les méthodes dans la classe connection
+    PreparedStatement pst; //code sql dans java
 
 
 
@@ -33,7 +33,9 @@ public class Employe {
         connect();
         AjouterEmploye();
         Rechercher();
+
     }
+
 
 
     //Connection to database
@@ -48,7 +50,6 @@ public class Employe {
         catch (ClassNotFoundException ex)
         {
             ex.printStackTrace();
-
         }
         catch (SQLException ex)
         {
@@ -79,16 +80,16 @@ public class Employe {
                 password = pwdEmp.getPassword().toString().trim();
                 salaire = salEmp.getText().trim();
 
-                if(!ChampEstVide(nom,prenom,adresse,mail,password,salaire))
+                if(ChampEstVide(nom,prenom,adresse,mail,password,salaire)==true)
                 {
                     JOptionPane.showMessageDialog(null, "Verifiez Les Champs !!");
                     nomEmp.requestFocus();
                 }
                 else
                 {
-                    if(ChampSalaireEstDouble(salaire) == false)
+                    if(ChampSalaireEstDouble(salaire)==false || salaire.length() == 0)
                     {
-                        JOptionPane.showMessageDialog(null, "Verifiez Les Champs !!");
+                        JOptionPane.showMessageDialog(null, "Verifiez Salaire !!");
                         salEmp.setText("");
                         salEmp.requestFocus();
                     }
@@ -105,7 +106,7 @@ public class Employe {
                             pst.setString(6, salaire);
                             pst.setString(7, post);
                             pst.setString(8, "0");
-                            pst.executeUpdate();
+                            pst.executeUpdate(); //insertion
                             JOptionPane.showMessageDialog(null, "Employé Ajouté !!");
                             Actualiser();
                             nomEmp.setText("");
@@ -115,6 +116,7 @@ public class Employe {
                             pwdEmp.setText("");
                             salEmp.setText("");
                             nomEmp.requestFocus();
+
                         }
                         catch (SQLException e1)
                         {
@@ -146,7 +148,10 @@ public class Employe {
                         pst = con.prepareStatement("select idemp,nom,prenom,adresse,mail,salaire,post from employe where idemp like '"+rech+"%' or nom like '"+rech+"%'");
 
                         ResultSet rs = pst.executeQuery();
+
+                        //JOptionPane.showMessageDialog(null, "Non trouvé");
                         table1.setModel(DbUtils.resultSetToTableModel(rs));
+
                     }
                     catch (SQLException ex)
                     {

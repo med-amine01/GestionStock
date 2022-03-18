@@ -134,7 +134,7 @@
         <properties>
           <enabled value="true"/>
           <model>
-            <item value=" Stock"/>
+            <item value="Stock"/>
             <item value="Vendeur"/>
             <item value="ADMIN"/>
           </model>
