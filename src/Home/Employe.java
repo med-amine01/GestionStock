@@ -27,7 +27,7 @@ public class Employe {
     Connection con;
     PreparedStatement pst;
 
-
+    //......
 
     //Constructeur
     public Employe() {
