@@ -144,9 +144,16 @@ public class Employe {
                     try
                     {
                         pst = con.prepareStatement("select idemp,nom,prenom,adresse,mail,salaire,post from employe where idemp like '"+rech+"%' or nom like '"+rech+"%'");
-
                         ResultSet rs = pst.executeQuery();
                         table1.setModel(DbUtils.resultSetToTableModel(rs));
+
+                        //System.out.println(table1.getRowCount());
+
+                        if(table1.getRowCount() == 0)
+                        {
+                            JOptionPane.showMessageDialog(null, "Non Trouvé");
+                        }
+
                     }
                     catch (SQLException ex)
                     {
@@ -159,6 +166,8 @@ public class Employe {
     }
 
 
+
+
     //---------------------- chargement du tableau -----------------------------
     public void Actualiser()
     {
@@ -166,7 +175,9 @@ public class Employe {
         {
             pst = con.prepareStatement("select idemp,nom,prenom,adresse,mail,salaire,post from employe");
             ResultSet rs = pst.executeQuery();
+
             table1.setModel(DbUtils.resultSetToTableModel(rs));
+
         }
         catch (SQLException e)
         {
