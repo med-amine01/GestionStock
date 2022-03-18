@@ -86,39 +86,48 @@ public class Employe {
                 }
                 else
                 {
-                    if(ChampSalaireEstDouble(salaire) == false)
+                    if(!MailEstUnique(mail))
                     {
-                        JOptionPane.showMessageDialog(null, "Verifiez Les Champs !!");
-                        salEmp.setText("");
-                        salEmp.requestFocus();
+                        JOptionPane.showMessageDialog(null, "L'employé Déjà Existe !!");
+                        mailEmp.setText("");
+                        mailEmp.requestFocus();
                     }
                     else
                     {
-                        try
+                        if(ChampSalaireEstDouble(salaire) == false)
                         {
-                            pst = con.prepareStatement("insert into employe (password,nom,prenom,adresse,mail,salaire,post,tentative) values (?,?,?,?,?,?,?,?)");
-                            pst.setString(1, password);
-                            pst.setString(2, nom);
-                            pst.setString(3, prenom);
-                            pst.setString(4, adresse);
-                            pst.setString(5, mail);
-                            pst.setString(6, salaire);
-                            pst.setString(7, post);
-                            pst.setString(8, "0");
-                            pst.executeUpdate();
-                            JOptionPane.showMessageDialog(null, "Employé Ajouté !!");
-                            Actualiser();
-                            nomEmp.setText("");
-                            preEmp.setText("");
-                            addEmp.setText("");
-                            mailEmp.setText("");
-                            pwdEmp.setText("");
+                            JOptionPane.showMessageDialog(null, "Verifiez Le salaire !!");
                             salEmp.setText("");
-                            nomEmp.requestFocus();
+                            salEmp.requestFocus();
                         }
-                        catch (SQLException e1)
+                        else
                         {
-                            e1.printStackTrace();
+                            try
+                            {
+                                pst = con.prepareStatement("insert into employe (password,nom,prenom,adresse,mail,salaire,post,tentative) values (?,?,?,?,?,?,?,?)");
+                                pst.setString(1, password);
+                                pst.setString(2, nom);
+                                pst.setString(3, prenom);
+                                pst.setString(4, adresse);
+                                pst.setString(5, mail);
+                                pst.setString(6, salaire);
+                                pst.setString(7, post);
+                                pst.setString(8, "0");
+                                pst.executeUpdate();
+                                JOptionPane.showMessageDialog(null, "Employé Ajouté !!");
+                                Actualiser();
+                                nomEmp.setText("");
+                                preEmp.setText("");
+                                addEmp.setText("");
+                                mailEmp.setText("");
+                                pwdEmp.setText("");
+                                salEmp.setText("");
+                                nomEmp.requestFocus();
+                            }
+                            catch (SQLException e1)
+                            {
+                                e1.printStackTrace();
+                            }
                         }
                     }
                 }
@@ -220,6 +229,40 @@ public class Employe {
             b = false;
         }
         return b;
+    }
+
+
+    //--------------- mail unique et chargement ---------------
+    public boolean MailEstUnique(String inputMail)
+    {
+        String [] tabmail = new String[0];
+        try
+        {
+            pst = con.prepareStatement("select mail from employe");
+            ResultSet rs = pst.executeQuery();
+            int i = 0;
+            //empiler tabmail avec les mail à partir de la base de donnée
+            while(rs.next())
+            {
+                tabmail[i] = rs.getString(4);
+                i++;
+            }
+            //table1.setModel(DbUtils.resultSetToTableModel(rs));
+
+            for(int j=0; j<tabmail.length;j++)
+            {
+                if(inputMail.equals(tabmail[j]))
+                {
+                    return false;
+                }
+            }
+
+        }
+        catch (SQLException e)
+        {
+            e.printStackTrace();
+        }
+        return true;
     }
 
 
