@@ -28,7 +28,6 @@ public class Employe {
     Connection con;
     PreparedStatement pst;
 
-    //......
 
     //Constructeur
     public Employe() {
@@ -36,7 +35,8 @@ public class Employe {
         AjouterEmploye();
         Rechercher();
         Supprimer();
-
+        Modifier();
+        Confirme();
 
     }
 
@@ -243,8 +243,7 @@ public class Employe {
             {
                 listid.add(rs.getString("idemp"));
             }
-            System.out.println(listid);
-            //table1.setModel(DbUtils.resultSetToTableModel(rs));
+
 
             for(int j=0; j<listid.size();j++)
             {
@@ -267,8 +266,69 @@ public class Employe {
         modBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                String [] tabpst= new String[3];
-                String nom,prenom,adresse,mail,post,password,salaire;
+
+                String id=inputEmp.getText();
+                if(ChampsIdEstInt(id)==false || IdExist(id)==false)
+                {
+                    JOptionPane.showMessageDialog(null, "Impossible De Modifier (id invalide)");
+                    inputEmp.setText("");
+                    inputEmp.requestFocus();
+                }
+                else
+                {
+                    try
+                    {
+                        pst = con.prepareStatement("select nom,prenom,adresse,mail,salaire,post,password from employe where idemp = "+id+";");
+                        ResultSet rs = pst.executeQuery();
+
+                        while(rs.next())
+                        {
+                            nomEmp.setText(rs.getString("nom"));
+                            preEmp.setText(rs.getString("prenom"));
+                            addEmp.setText(rs.getString("adresse"));
+                            mailEmp.setText(rs.getString("mail"));
+                            salEmp.setText(rs.getString("salaire"));
+
+
+                            if(rs.getString("post").equals("Stock"))
+                            {
+                                PostEmp.setSelectedIndex(0);
+                            }
+
+                            if(rs.getString("post").equals("Vendeur"))
+                            {
+                                PostEmp.setSelectedIndex(1);
+                            }
+
+                            if(rs.getString("post").equals("ADMIN"))
+                            {
+                                PostEmp.setSelectedIndex(2);
+                            }
+                            pwdEmp.setText(rs.getString("password"));
+                        }
+                    }
+                    catch (SQLException e1)
+                    {
+                        e1.printStackTrace();
+                    }
+                }
+            }
+        });
+    }
+
+    //------------------ Confirmer Modification ------------------------
+    public void Confirme()
+    {
+        confBtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String [] tabpst = new String[3];
+                for(int i=0; i<3; i++) {
+                    tabpst[i] = PostEmp.getSelectedItem().toString();
+                }
+
+                String nom,prenom,adresse,mail,post,password,salaire, idconf;
+                idconf = inputEmp.getText().trim();
                 nom = nomEmp.getText().trim();
                 prenom = preEmp.getText().trim();
                 adresse = addEmp.getText().trim();
@@ -277,24 +337,32 @@ public class Employe {
                 password = pwdEmp.getPassword().toString().trim();
                 salaire = salEmp.getText().trim();
 
-                String id=inputEmp.getText();
-                if(ChampsIdEstInt(id)==false || IdExist(id)==false)
+
+                if(ChampEstVide(nom, prenom, adresse, mail, password, salaire))
                 {
-                    JOptionPane.showMessageDialog(null, "Impossible De Supprimer");
-                    inputEmp.setText("");
-                    inputEmp.requestFocus();
+                    JOptionPane.showMessageDialog(null, "Verifiez Les Champs !!");
+                    nomEmp.requestFocus();
                 }
                 else
                 {
                     try
                     {
-                        pst = con.prepareStatement("delete from employe where idemp = ?");
-                        pst.setString(1, id);
+                        pst = con.prepareStatement("update employe set nom = ? , prenom = ? , adresse = ? , mail = ? , salaire = ? , post = ? , password = ? where idemp = ? ");
+
+                        pst.setString(1, nom);
+                        pst.setString(2, prenom);
+                        pst.setString(3, adresse);
+                        pst.setString(4, mail);
+                        pst.setString(5, salaire);
+                        pst.setString(6, post);
+                        pst.setString(7, password);
+                        pst.setString(8, idconf);
                         pst.executeUpdate();
-                        JOptionPane.showMessageDialog(null, "Employé Supprimé !!");
+                        JOptionPane.showMessageDialog(null, "Employé Modifié !!");
                         Actualiser();
                         inputEmp.setText("");
                         inputEmp.requestFocus();
+
                     }
                     catch (SQLException e1)
                     {
@@ -422,7 +490,6 @@ public class Employe {
             return false;
         }
         return true ;
-        //hi
     }
 
 }
