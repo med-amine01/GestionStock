@@ -6,6 +6,8 @@ import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 public class Employe {
     public JPanel MainEmploye;
@@ -235,23 +237,23 @@ public class Employe {
     //--------------- mail unique et chargement ---------------
     public boolean MailEstUnique(String inputMail)
     {
-        String [] tabmail = new String[0];
+        ArrayList listmail = new ArrayList();
         try
         {
             pst = con.prepareStatement("select mail from employe");
             ResultSet rs = pst.executeQuery();
-            int i = 0;
+
             //empiler tabmail avec les mail à partir de la base de donnée
             while(rs.next())
             {
-                tabmail[i] = rs.getString(4);
-                i++;
+                listmail.add(rs.getString("mail"));
             }
+            System.out.println(listmail);
             //table1.setModel(DbUtils.resultSetToTableModel(rs));
 
-            for(int j=0; j<tabmail.length;j++)
+            for(int j=0; j<listmail.size();j++)
             {
-                if(inputMail.equals(tabmail[j]))
+                if(inputMail.equals(listmail.get(j)))
                 {
                     return false;
                 }
