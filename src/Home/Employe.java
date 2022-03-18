@@ -143,7 +143,8 @@ public class Employe {
                 {
                     try
                     {
-                        pst = con.prepareStatement("select idemp,nom,prenom,adresse,mail,salaire,post from employe where idemp like '"+rech+"%' or nom like '"+rech+"%'");
+                        pst = con.prepareStatement("select idemp,nom,prenom,adresse,mail,salaire,post from employe where idemp like '"+rech+"%' or nom like '"+rech+"%'" +
+                                "or prenom like '"+rech+"%' or adresse like '"+rech+"%' or salaire like '"+rech+"%' or post like '"+rech+"%'");
                         ResultSet rs = pst.executeQuery();
                         table1.setModel(DbUtils.resultSetToTableModel(rs));
 
