@@ -49,6 +49,8 @@ public class Employe {
         System.out.println(currentUser);
         this.currentUser.setText(currentUser);
     }
+
+
     //Connection to database
     public void connect()
     {
