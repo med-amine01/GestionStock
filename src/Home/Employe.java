@@ -13,7 +13,7 @@ public class Employe {
     private JTextField preEmp;
     private JTextField addEmp;
     private JTextField nomEmp;
-    private JPasswordField pwdEmp;
+    private JTextField pwdEmp;
     private JComboBox PostEmp ;
     private JTable table1;
     private JButton ajouBtn;
@@ -23,6 +23,11 @@ public class Employe {
     private JButton rechBtn;
     private JTextField mailEmp;
     private JTextField salEmp;
+
+    public JLabel getCurrentUser() {
+        return currentUser;
+    }
+
     private JLabel currentUser;
     private JButton confBtn;
     Connection con;
@@ -37,10 +42,13 @@ public class Employe {
         Supprimer();
         Modifier();
         Confirme();
-
     }
 
-
+    //-------------- set current user -------------------
+    public void setCurrentUser(String currentUser) {
+        System.out.println(currentUser);
+        this.currentUser.setText(currentUser);
+    }
     //Connection to database
     public void connect()
     {
@@ -81,7 +89,7 @@ public class Employe {
                 adresse = addEmp.getText().trim();
                 mail = mailEmp.getText().trim();
                 post = tabpst[PostEmp.getSelectedIndex()];
-                password = pwdEmp.getPassword().toString().trim();
+                password = pwdEmp.getText().trim();
                 salaire = salEmp.getText().trim();
 
                 if(ChampEstVide(nom, prenom, adresse, mail, password, salaire))
@@ -110,7 +118,7 @@ public class Employe {
                             try
                             {
                                 pst = con.prepareStatement("insert into employe (password,nom,prenom,adresse,mail,salaire,post,tentative) values (?,?,?,?,?,?,?,?)");
-                                pst.setString(1, password);
+                                pst.setString(1, crypte(password));
                                 pst.setString(2, nom);
                                 pst.setString(3, prenom);
                                 pst.setString(4, adresse);
@@ -288,7 +296,7 @@ public class Employe {
                             addEmp.setText(rs.getString("adresse"));
                             mailEmp.setText(rs.getString("mail"));
                             salEmp.setText(rs.getString("salaire"));
-
+                            pwdEmp.setText(rs.getString("password"));
 
                             if(rs.getString("post").equals("Stock"))
                             {
@@ -304,7 +312,6 @@ public class Employe {
                             {
                                 PostEmp.setSelectedIndex(2);
                             }
-                            pwdEmp.setText(rs.getString("password"));
                         }
                     }
                     catch (SQLException e1)
@@ -334,7 +341,7 @@ public class Employe {
                 adresse = addEmp.getText().trim();
                 mail = mailEmp.getText().trim();
                 post = tabpst[PostEmp.getSelectedIndex()];
-                password = pwdEmp.getPassword().toString().trim();
+                password = pwdEmp.getText().trim();
                 salaire = salEmp.getText().trim();
 
 
@@ -491,5 +498,20 @@ public class Employe {
         }
         return true ;
     }
+
+    //----------------- cryptage -----------------------------
+    public static String crypte(String pass)
+    {
+        char [] chars = pass.toCharArray(); // hello -> [ 'h', 'e' , .... ]
+        String res = "";
+        for(char c : chars)
+        {
+            c+= 5; //avancement avec code ascii (chaque cara avance + 5 )
+            res+=c;
+        }
+
+        return  res;
+    }
+
 
 }

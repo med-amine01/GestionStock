@@ -70,7 +70,7 @@
               <text value="Mot de passe"/>
             </properties>
           </component>
-          <component id="a7277" class="javax.swing.JPasswordField" binding="pwdLog">
+          <component id="398c8" class="javax.swing.JTextField" binding="pwdLog">
             <constraints>
               <grid row="2" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
                 <preferred-size width="150" height="-1"/>
