@@ -24,34 +24,40 @@ public class Employe {
     private JTextField mailEmp;
     private JTextField salEmp;
 
-    public JLabel getCurrentUser() {
-        return currentUser;
-    }
 
     private JLabel currentUser;
     private JButton confBtn;
+    private JButton retBtn;
     Connection con;
     PreparedStatement pst;
+    JFrame frameEmp;
 
 
     //Constructeur
-    public Employe() {
+    public Employe(String NomCurrentUser) {
+        System.out.println("NEW EMPLOYE");
+        frameEmp = new JFrame("Employe");
+        frameEmp.setContentPane(MainEmploye);
+        frameEmp.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        frameEmp.setLocationRelativeTo(null);
+        frameEmp.setResizable(false);
+        frameEmp.pack();
+        frameEmp.setVisible(true);
+
+        setCurrentUser(NomCurrentUser);
         connect();
+        Actualiser();
         AjouterEmploye();
         Rechercher();
         Supprimer();
         Modifier();
         Confirme();
-    }
+        RetourMainListChoix(NomCurrentUser);
 
-    //-------------- set current user -------------------
-    public void setCurrentUser(String currentUser) {
-        System.out.println(currentUser);
-        this.currentUser.setText(currentUser);
     }
 
 
-    //Connection to database
+    //-------------------- Connection à la base de donnée -----------------------
     public void connect()
     {
         try {
@@ -399,7 +405,6 @@ public class Employe {
         }
     }
 
-
     //------------------------------- verification tous les champs ----------------------------
     public boolean ChampEstVide(String...champs)
     {
@@ -515,5 +520,21 @@ public class Employe {
         return  res;
     }
 
+    //------------ retour -------------
+    public void RetourMainListChoix(String user)
+    {
+        retBtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                frameEmp.dispose();
+                new Inter(user);
+            }
+        });
+    }
 
+    //-------------- set current user -------------------
+    public void setCurrentUser(String currentUser) {
+        System.out.println(currentUser);
+        this.currentUser.setText(currentUser);
+    }
 }

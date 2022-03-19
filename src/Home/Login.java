@@ -1,9 +1,7 @@
 package Home;
 
-import net.proteanit.sql.DbUtils;
 
 import javax.swing.*;
-import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.*;
@@ -17,20 +15,24 @@ public class Login {
     private JTextField pwdLog;
     Connection con;
     PreparedStatement pst;
+    JFrame frameLogin ;
 
-    JFrame frame ;
 
     public Login() {
-        frame = new JFrame("Login");
-        frame.setContentPane(MainLogin);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.pack();
-        frame.setLocationRelativeTo(null);
-        frame.setResizable(false);
-        frame.setVisible(true);
+
+        System.out.println("NEW LOGIN");
+        frameLogin = new JFrame("Login");
+        frameLogin.setContentPane(MainLogin);
+        frameLogin.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frameLogin.pack();
+        frameLogin.setLocationRelativeTo(null);
+        frameLogin.setResizable(false);
+        frameLogin.setVisible(true);
+
         connect();
         Authentifier();
     }
+
 
 
     //Connection to database
@@ -106,7 +108,7 @@ public class Login {
                                                 {
                                                     JOptionPane.showMessageDialog(null, "Authentifié ADMIN");
                                                     AdminWindow(rs.getString("nom"));
-                                                    frame.dispose();
+                                                    frameLogin.dispose();
                                                 }
                                             }
                                         }
@@ -298,7 +300,7 @@ public class Login {
                 if(post.equals("ADMIN"))
                 {
                     AdminWindow(CurentUser);
-                    frame.dispose();
+                    //frameLog.dispose();
                 }
                 // stock window
                 if(post.equals("Stock"))
@@ -321,14 +323,9 @@ public class Login {
     //---------------- ADMIN WINDOW -----------------
     public void AdminWindow(String CurrentUser)
     {
-        JPanel emp = new Employe().MainEmploye ;
-        JFrame frame = new JFrame("Employe");
-        frame.setContentPane(emp);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.pack();
-        frame.setLocationRelativeTo(null);
-        frame.setResizable(false);
-        frame.setVisible(true);
+        System.out.println("ADMIN WINDOW");
+        new Inter(CurrentUser);
+
     }
 
 
