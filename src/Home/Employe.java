@@ -180,7 +180,7 @@ public class Employe {
     }
 
     //---------------------SUPPRIMER EMPLOYE----------------------------------
-    public void Supprimer()//les admins ne peuvent pas etre supprimés
+    public void Supprimer()//les admins ne peuvent pas etre supprimés après auth
     {
         SuppBtn.addActionListener(new ActionListener() {
             @Override
