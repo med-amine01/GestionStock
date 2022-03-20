@@ -35,7 +35,7 @@ public class Login {
 
 
 
-    //Connection to database
+    //-----------------Connection to database----------------------
     public void connect()
     {
         try {
@@ -119,8 +119,6 @@ public class Login {
                                     }
 
 
-
-
                                     //========================================== STOCK ==================================================
                                     if(rs.getString("post").equals("Stock")) // get poste employe (STOCK)
                                     {
@@ -140,7 +138,8 @@ public class Login {
                                                 else
                                                 {
                                                     JOptionPane.showMessageDialog(null, "Authentifié Stock");
-                                                    //AdminWindow();
+                                                    StockWindow();
+                                                    frameLogin.dispose();
                                                 }
                                             }
                                         }
@@ -330,7 +329,10 @@ public class Login {
 
 
     //------------------ Stock WINDOW -----------------------
-
+    public void StockWindow()
+    {
+        new Entree();
+    }
 
     //------------------ Vendeur WINDOW ----------------------
 
