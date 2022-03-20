@@ -455,7 +455,7 @@ public class Employe {
             {
                 listmail.add(rs.getString("mail"));
             }
-            System.out.println(listmail);
+            //System.out.println(listmail);
             //table1.setModel(DbUtils.resultSetToTableModel(rs));
 
             for(int j=0; j<listmail.size();j++)
