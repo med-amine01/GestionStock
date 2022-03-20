@@ -19,12 +19,13 @@ public class Entree {
     private JComboBox comboBox2;
     private JButton actBtn;
     private JButton retBtn;
+    private JLabel currentEmp;
     JFrame frameEnt;
 
     Connection con;
     PreparedStatement pst;
 
-    public Entree()
+    public Entree(String empid)
     {
         frameEnt = new JFrame("Entree");
         frameEnt.setContentPane(MainEntree);
@@ -34,11 +35,14 @@ public class Entree {
         frameEnt.setResizable(false);
         frameEnt.setVisible(true);
 
+        setCurrentUser(empid);
         connect();
         Actualiser();
-        confirmer();
         //actualiser();
-        //Retour();
+        //confirmer();
+        RetourMainListChoix(empid);
+
+
 
     }
     //-------------------- Connection à la base de donnée -----------------------
@@ -77,14 +81,41 @@ public class Entree {
         }
     }
 
+    //--------------------------actu-----------------------------
+    public void actualiser()
+    {
+        actBtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Actualiser();
+            }
+        });
+    }
+
     //----------------confirmer----------------------------
     public void confirmer()
     {
         confBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-
-
+                //ajout entrée
+            }
+        });
+    }
+    //-------------- set current empid -------------------
+    public void setCurrentUser(String currentUser)
+    {
+        System.out.println(currentUser);
+        this.currentEmp.setText(currentUser);
+    }
+    //------------ retour -------------
+    public void RetourMainListChoix(String user)
+    {
+        retBtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                frameEnt.dispose();
+                new Login();
             }
         });
     }

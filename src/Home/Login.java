@@ -138,7 +138,7 @@ public class Login {
                                                 else
                                                 {
                                                     JOptionPane.showMessageDialog(null, "Authentifié Stock");
-                                                    StockWindow();
+                                                    StockWindow(rs2.getString("idemp"));
                                                     frameLogin.dispose();
                                                 }
                                             }
@@ -148,8 +148,6 @@ public class Login {
                                             ex.printStackTrace();
                                         }
                                     }
-
-
 
 
                                     //=================================== Vendeur =====================================================
@@ -169,7 +167,8 @@ public class Login {
                                                 else
                                                 {
                                                     JOptionPane.showMessageDialog(null, "Authentifié Vendeur");
-                                                    //AdminWindow();
+                                                    VendeurWindow(rs3.getString("idemp"));
+                                                    frameLogin.dispose();
                                                 }
                                             }
                                         }
@@ -322,20 +321,21 @@ public class Login {
     //---------------- ADMIN WINDOW -----------------
     public void AdminWindow(String CurrentUser)
     {
-        System.out.println("ADMIN WINDOW");
+        //System.out.println("ADMIN WINDOW");
         new Inter(CurrentUser);
-
     }
 
 
     //------------------ Stock WINDOW -----------------------
-    public void StockWindow()
+    public void StockWindow(String idemp)
     {
-        new Entree();
+        new Entree(idemp);
     }
 
     //------------------ Vendeur WINDOW ----------------------
-
-
+    public void VendeurWindow(String vendid)
+    {
+        new Sortie(vendid);
+    }
 
 }

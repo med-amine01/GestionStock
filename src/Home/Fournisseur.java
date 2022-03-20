@@ -22,26 +22,36 @@ public class Fournisseur {
     private JButton rechBtn;
     private JButton ajouBtn;
     private JButton confBtn;
+    private JButton retBtn;
+    private JLabel currentUser;
 
     Connection con;
     PreparedStatement pst;
+    JFrame frameFour;
 
 
-    public Fournisseur() {
+    public Fournisseur(String NomCurrentUser) {
+        frameFour = new JFrame("Fournisseur");
+        frameFour.setContentPane(MainFour);
+        frameFour.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        frameFour.pack();
+        frameFour.setLocationRelativeTo(null);
+        frameFour.setResizable(false);
+        frameFour.setVisible(true);
+
+        setCurrentUser(NomCurrentUser);
         connect();
         Actualiser();
         AjouterFournisseur();
+        Rechercher();
+        Supprimer();
+        Modifier();
+        Confirme();
+        RetourMainListChoix(NomCurrentUser);
+
+
+
     }
-//============================================================= MAIN =================================================
-//    public static void main(String[] args) {
-//        JFrame frame = new JFrame("Fournisseur");
-//        frame.setContentPane(new Fournisseur().MainFour);
-//        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-//        frame.pack();
-//        frame.setVisible(true);
-//    }
-
-
 
 
     //-------------------- Connection à la base de donnée -----------------------
@@ -246,7 +256,6 @@ public class Fournisseur {
                     }
                     i++;
                 }
-
             }
             catch (SQLException e)
             {
@@ -288,70 +297,219 @@ public class Fournisseur {
         }
     }
 
-    /*
-
-
-
-                String nom,adresse,mail,numtel;
-                nom = nomEmp.getText().trim();
-                prenom = preEmp.getText().trim();
-                adresse = addEmp.getText().trim();
-                mail = mailEmp.getText().trim();
-                post = tabpst[PostEmp.getSelectedIndex()];
-                password = pwdEmp.getText().trim();
-                salaire = salEmp.getText().trim();
-
-                if(ChampEstVide(nom, prenom, adresse, mail, password, salaire))
+    //----------------------- Rechercher et afficher ------------------------
+    public void Rechercher()
+    {
+        rechBtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String rech = inputFour.getText().trim();
+                if(rech.equals(""))
                 {
-                    JOptionPane.showMessageDialog(null, "Verifiez Les Champs !!");
-                    nomEmp.requestFocus();
+                    Actualiser();
                 }
                 else
                 {
-                    if(!MailEstUnique(mail) || !valideMail(mail))
+                    try
                     {
-                        JOptionPane.showMessageDialog(null, "L'employé Déjà Existe ou  mail invalide");
-                        mailEmp.setText("");
-                        mailEmp.requestFocus();
+                        pst = con.prepareStatement("select idfour,nom,adresse,tel,mail from fournisseur where idfour like '"+rech+"%' or nom like '"+rech+"%'" +
+                                "or adresse like '"+rech+"%' or mail like '"+rech+"%'");
+                        ResultSet rs = pst.executeQuery();
+                        table1.setModel(DbUtils.resultSetToTableModel(rs));
+
+
+                        if(table1.getRowCount() == 0)
+                        {
+                            JOptionPane.showMessageDialog(null, "Non Trouvé");
+                        }
+
                     }
-                    else
+                    catch (SQLException ex)
                     {
-                        if(!ChampSalaireEstDouble(salaire))
-                        {
-                            JOptionPane.showMessageDialog(null, "Verifiez Le salaire !!");
-                            salEmp.setText("");
-                            salEmp.requestFocus();
-                        }
-                        else
-                        {
-                            try
-                            {
-                                pst = con.prepareStatement("insert into employe (password,nom,prenom,adresse,mail,salaire,post,tentative) values (?,?,?,?,?,?,?,?)");
-                                pst.setString(1, crypte(password));
-                                pst.setString(2, nom);
-                                pst.setString(3, prenom);
-                                pst.setString(4, adresse);
-                                pst.setString(5, mail);
-                                pst.setString(6, salaire);
-                                pst.setString(7, post);
-                                pst.setString(8, "0");
-                                pst.executeUpdate();
-                                JOptionPane.showMessageDialog(null, "Employé Ajouté !!");
-                                Actualiser();
-                                nomEmp.setText("");
-                                preEmp.setText("");
-                                addEmp.setText("");
-                                mailEmp.setText("");
-                                pwdEmp.setText("");
-                                salEmp.setText("");
-                                nomEmp.requestFocus();
-                            }
-                            catch (SQLException e1)
-                            {
-                                e1.printStackTrace();
-                            }
-                        }
+                        ex.printStackTrace();
                     }
                 }
-     */
+            }
+        });
+    }
+    //---------------------SUPPRIMER FOURNISSEUR----------------------------------
+    public void Supprimer()//les admins ne peuvent pas etre supprimés après auth
+    {
+        suppBtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String id=inputFour.getText();
+                if(ChampsIdEstInt(id)==false || IdExist(id)==false)
+                {
+                    JOptionPane.showMessageDialog(null, "Impossible De Supprimer");
+                    inputFour.setText("");
+                    inputFour.requestFocus();
+                }
+                else
+                {
+                    try
+                    {
+                        pst = con.prepareStatement("delete from fournisseur where idfour = ?");
+                        pst.setString(1, id);
+                        pst.executeUpdate();
+                        JOptionPane.showMessageDialog(null, "Fournisseur Supprimé !!");
+                        Actualiser();
+                        inputFour.setText("");
+                        inputFour.requestFocus();
+                    }
+                    catch (SQLException e1)
+                    {
+                        e1.printStackTrace();
+                    }
+                }
+            }
+        });
+    }
+    //----------------------------id chiffres-----------------------------
+    public boolean ChampsIdEstInt(String champsId)
+    {
+        boolean b = false ;
+        try
+        {
+            Integer.parseInt(champsId);
+            b = true;
+        }
+        catch(NumberFormatException e)
+        {
+            b = false;
+        }
+        return b;
+    }
+    //--------------------------id exist---------------------------------
+    public boolean IdExist(String id)
+    {
+        ArrayList listid = new ArrayList();
+        try
+        {
+            pst = con.prepareStatement("select idfour from fournisseur");
+            ResultSet rs = pst.executeQuery();
+
+
+            while(rs.next())
+            {
+                listid.add(rs.getString("idfour"));
+            }
+
+
+            for(int j=0; j<listid.size();j++)
+            {
+                if(id.equals(listid.get(j)))
+                {
+                    return true;
+                }
+            }
+
+        }
+        catch (SQLException e)
+        {
+            e.printStackTrace();
+        }
+        return false;
+    }
+    //-----------------UPDATE FOURNISSEUR-------------------------------
+    public void Modifier()
+    {
+        modBtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String id=inputFour.getText();
+                if(ChampsIdEstInt(id)==false || IdExist(id)==false)
+                {
+                    JOptionPane.showMessageDialog(null, "Impossible De Modifier (id invalide)");
+                    inputFour.setText("");
+                    inputFour.requestFocus();
+                }
+                else
+                {
+                    try
+                    {
+                        pst = con.prepareStatement("select nom,adresse,tel,mail from fournisseur where idfour = "+id+";");
+                        ResultSet rs = pst.executeQuery();
+
+                        while(rs.next())
+                        {
+                            nomFour.setText(rs.getString("nom"));
+                            addFour.setText(rs.getString("adresse"));
+                            telFour.setText(rs.getString("tel"));
+                            mailFour.setText(rs.getString("mail"));
+
+                        }
+                    }
+                    catch (SQLException e1)
+                    {
+                        e1.printStackTrace();
+                    }
+                }
+            }
+        });
+    }
+    //------------------ Confirmer Modification ------------------------
+    public void Confirme()
+    {
+        confBtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                String nom,adresse,tel,mail,idconf;
+                idconf = inputFour.getText().trim();
+                nom = nomFour.getText().trim();
+                adresse = addFour.getText().trim();
+                tel = telFour.getText().trim();
+                mail = mailFour.getText().trim();
+
+
+
+                if(ChampEstVide(nom,adresse,tel,mail))
+                {
+                    JOptionPane.showMessageDialog(null, "Verifiez Les Champs !!");
+                    nomFour.requestFocus();
+                }
+                else
+                {
+                    try
+                    {
+                        pst = con.prepareStatement("update fournisseur set nom = ?, adresse = ? , tel = ?, mail = ? where idfour = ? ");
+
+                        pst.setString(1, nom);
+                        pst.setString(2, adresse);
+                        pst.setString(3, tel);
+                        pst.setString(4, mail);
+                        pst.setString(5, idconf);
+                        pst.executeUpdate();
+                        JOptionPane.showMessageDialog(null, "Fournisseur Modifié !!");
+                        Actualiser();
+                        inputFour.setText("");
+                        inputFour.requestFocus();
+
+                    }
+                    catch (SQLException e1)
+                    {
+                        e1.printStackTrace();
+                    }
+                }
+            }
+        });
+    }
+    //------------ retour -------------
+    public void RetourMainListChoix(String user)
+    {
+        retBtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                frameFour.dispose();
+                new Inter(user);
+            }
+        });
+    }
+    //-------------- set current user -------------------
+    public void setCurrentUser(String currentUser) {
+        System.out.println(currentUser);
+        this.currentUser.setText(currentUser);
+    }
+
 }

@@ -23,11 +23,11 @@ public class Employe {
     private JButton rechBtn;
     private JTextField mailEmp;
     private JTextField salEmp;
-
-
     private JLabel currentUser;
     private JButton confBtn;
     private JButton retBtn;
+
+
     Connection con;
     PreparedStatement pst;
     JFrame frameEmp;
@@ -35,7 +35,6 @@ public class Employe {
 
     //Constructeur
     public Employe(String NomCurrentUser) {
-        System.out.println("NEW EMPLOYE");
         frameEmp = new JFrame("Employe");
         frameEmp.setContentPane(MainEmploye);
         frameEmp.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -77,6 +76,22 @@ public class Employe {
         }
     }
 
+    //---------------------- chargement du tableau -----------------------------
+    public void Actualiser()
+    {
+        try
+        {
+            pst = con.prepareStatement("select idemp,nom,prenom,adresse,mail,salaire,post from employe");
+            ResultSet rs = pst.executeQuery();
+
+            table1.setModel(DbUtils.resultSetToTableModel(rs));
+
+        }
+        catch (SQLException e)
+        {
+            e.printStackTrace();
+        }
+    }
 
     //--------------------------------AJOUTER EMPLOYE----------------------------
     public void AjouterEmploye()
@@ -388,22 +403,6 @@ public class Employe {
         });
     }
 
-    //---------------------- chargement du tableau -----------------------------
-    public void Actualiser()
-    {
-        try
-        {
-            pst = con.prepareStatement("select idemp,nom,prenom,adresse,mail,salaire,post from employe");
-            ResultSet rs = pst.executeQuery();
-
-            table1.setModel(DbUtils.resultSetToTableModel(rs));
-
-        }
-        catch (SQLException e)
-        {
-            e.printStackTrace();
-        }
-    }
 
     //------------------------------- verification tous les champs ----------------------------
     public boolean ChampEstVide(String...champs)

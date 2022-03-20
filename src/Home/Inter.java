@@ -30,11 +30,30 @@ public class Inter {
 
 
         GererEmploye(NomCurrentUser);
+        GererFournisseur(NomCurrentUser);
+        GererClient(NomCurrentUser);
+        GererPiece(NomCurrentUser);
+        GererEntree(NomCurrentUser);
+        GererSortie(NomCurrentUser);
         Deconnexion();
+
+
 
     }
 
+    //------------------- Déconnexion ------------------------
+    public void Deconnexion()
+    {
+        decBtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JOptionPane.showMessageDialog(null, "Déconnecté !");
+                frameInter.dispose();
+                new Login();
+            }
+        });
 
+    }
 
     //------------------- Gérer les employes --------------------
     public void GererEmploye(String user)
@@ -48,17 +67,61 @@ public class Inter {
         });
     }
 
-    //------------------------ Déconnexion ------------------------
-    public void Deconnexion()
+    //------------------- Gérer les fournisseurs -----------------
+    public void GererFournisseur(String user)
     {
-        decBtn.addActionListener(new ActionListener() {
+        BtnFour.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                JOptionPane.showMessageDialog(null, "Déconnecté !");
                 frameInter.dispose();
-                new Login();
+                new Fournisseur(user);
             }
         });
-
     }
+    //------------------- Gérer les clients -----------------------
+    public void GererClient(String user)
+    {
+        BtnCli.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                frameInter.dispose();
+                new Client(user);
+            }
+        });
+    }
+    //------------------- Gérer les pièces ---------------------
+    public void GererPiece(String user)
+    {
+        BtnPiece.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                frameInter.dispose();
+                new Piece(user);
+            }
+        });
+    }
+    //------------------- Gérer les entrées admin --------------------------
+    public void GererEntree(String user)
+    {
+        Btnentree.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                frameInter.dispose();
+                new EntreeAdmin(user);
+            }
+        });
+    }
+    //------------------- Gérer les sorties admin -----------------------------
+    public void GererSortie(String user)
+    {
+        Btnsortie.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                frameInter.dispose();
+                new SortieAdmin(user);
+            }
+        });
+    }
+
+
 }
