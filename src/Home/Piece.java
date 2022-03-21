@@ -26,6 +26,18 @@ public class Piece {
     private JButton retBtn;
     private JLabel currentUser;
 
+
+    private String indexFour;
+    public String getIndexFour() {
+        return indexFour;
+    }
+
+    public void setIndexFour(String indexFour) {
+        this.indexFour = indexFour;
+    }
+
+
+
     Connection con;
     PreparedStatement pst;
     JFrame framePiece;
@@ -40,9 +52,10 @@ public class Piece {
         framePiece.pack();
         framePiece.setVisible(true);
 
-        setCurrentUser(NomCurrentUser);
         connect();
         setListeDeroulante();
+        IdFourList();
+        setCurrentUser(NomCurrentUser);
         Actualiser();
         AjouterPiece();
         Rechercher();
@@ -50,6 +63,7 @@ public class Piece {
         Modifier();
         Confirme();
         RetourMainListChoix(NomCurrentUser);
+
 
     }
 
@@ -91,6 +105,21 @@ public class Piece {
         }
     }
 
+
+    //----------------------- get and set id four in list déroulante --------------------
+    public void IdFourList()
+    {
+        setIndexFour(idfourp.getItemAt(0).toString());
+        idfourp.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                e.getSource();
+                String s = (String) idfourp.getSelectedItem();
+                setIndexFour(s);
+            }
+        });
+    }
+
     //--------------------------------AJOUTER PIECE----------------------------
     public void AjouterPiece()
     {
@@ -98,25 +127,12 @@ public class Piece {
             @Override
             public void actionPerformed(ActionEvent e) {
 
-
-                idfourp.setSelectedIndex(0);
-                ArrayList<String> listIDfour = new ArrayList();
-                int i = 0 ;
-                while (i<idfourp.getItemCount())
-                {
-                    listIDfour.add(idfourp.getSelectedItem().toString());
-                    i++;
-                }
-
-
-                String marque,modele,serie,qte,prixunitaire,idfour ;
+                String marque,modele,serie,qte,prixunitaire ;
                 marque = marquepiece.getText().trim();
                 modele = modelepiece.getText().trim();
                 serie = seriepiece.getText().trim();
                 qte = quantitepiece.getText().trim();
                 prixunitaire = prixunitairep.getText().trim();
-                idfour = listIDfour.get(idfourp.getSelectedIndex());
-
 
 
                 if(ChampEstVide(marque, modele, serie, qte, prixunitaire))
@@ -158,34 +174,46 @@ public class Piece {
                                 }
                                 else
                                 {
-                                    try
+                                    if(MMSEstUnique(marque, "marque") || MMSEstUnique(modele, "modele") || MMSEstUnique(serie, "serie"))
                                     {
-                                        pst = con.prepareStatement("insert into piece (marque,modele,serie,qte,prixunitaire,idfour) values (?,?,?,?,?,?)");
-                                        pst.setString(1, marque);
-                                        pst.setString(2, modele);
-                                        pst.setString(3, serie);
-                                        pst.setString(4, qte);
-                                        pst.setString(5, prixunitaire);
-                                        pst.setString(6, idfour);
-                                        pst.executeUpdate();
-                                        JOptionPane.showMessageDialog(null, "pièce Ajoutée !!");
-                                        Actualiser();
+                                        try
+                                        {
+                                            pst = con.prepareStatement("insert into piece (marque,modele,serie,qte,prixunitaire,idfour) values (?,?,?,?,?,?)");
+                                            pst.setString(1, marque);
+                                            pst.setString(2, modele);
+                                            pst.setString(3, serie);
+                                            pst.setString(4, qte);
+                                            pst.setString(5, prixunitaire);
+                                            pst.setString(6, getIndexFour());
+
+
+                                            pst.executeUpdate();
+                                            JOptionPane.showMessageDialog(null, "pièce Ajoutée !!");
+                                            Actualiser();
+                                            marquepiece.setText("");
+                                            modelepiece.setText("");
+                                            seriepiece.setText("");
+                                            quantitepiece.setText("");
+                                            prixunitairep.setText("");
+                                        }
+                                        catch (SQLException e1)
+                                        {
+                                            e1.printStackTrace();
+                                        }
+                                    }
+                                    else
+                                    {
+                                        JOptionPane.showMessageDialog(null, "Marque et Modele et Série Déjà EXIST !!");
                                         marquepiece.setText("");
                                         modelepiece.setText("");
                                         seriepiece.setText("");
-                                        quantitepiece.setText("");
-                                        prixunitairep.setText("");
-                                    }
-                                    catch (SQLException e1)
-                                    {
-                                        e1.printStackTrace();
+                                        marquepiece.requestFocus();
                                     }
                                 }
                             }
                         }
                     }
                 }
-                listIDfour.clear();
             }
         });
     }
@@ -203,22 +231,31 @@ public class Piece {
                 }
                 else
                 {
-                    try
+                    if(IdExist(rech)==false)
                     {
-                        pst = con.prepareStatement("select idpiece,marque,modele,serie,idfour from piece where idpiece like '"+rech+"%' or marque like '"+rech+"%'" +
-                                "or modele like '"+rech+"%' or serie like '"+rech+"%' or idfour like '"+rech+"%'");
-                        ResultSet rs = pst.executeQuery();
-                        table1.setModel(DbUtils.resultSetToTableModel(rs));
-
-                        if(table1.getRowCount() == 0)
-                        {
-                            JOptionPane.showMessageDialog(null, "Non Trouvé");
-                        }
-
+                        JOptionPane.showMessageDialog(null, "ID n'existe pas !!");
+                        inputpiece.setText("");
+                        inputpiece.requestFocus();
                     }
-                    catch (SQLException ex)
+                    else
                     {
-                        ex.printStackTrace();
+                        try
+                        {
+                            pst = con.prepareStatement("select idpiece,marque,modele,serie,idfour from piece where idpiece like '"+rech+"%' or marque like '"+rech+"%'" +
+                                    "or modele like '"+rech+"%' or serie like '"+rech+"%' or idfour like '"+rech+"%'");
+                            ResultSet rs = pst.executeQuery();
+                            table1.setModel(DbUtils.resultSetToTableModel(rs));
+
+                            if(table1.getRowCount() == 0)
+                            {
+                                JOptionPane.showMessageDialog(null, "Non Trouvé");
+                            }
+
+                        }
+                        catch (SQLException ex)
+                        {
+                            ex.printStackTrace();
+                        }
                     }
                 }
             }
@@ -234,7 +271,7 @@ public class Piece {
                 String id=inputpiece.getText();
                 if(ChampsIdEstInt(id)==false || IdExist(id)==false)
                 {
-                    JOptionPane.showMessageDialog(null, "Impossible De Supprimer");
+                    JOptionPane.showMessageDialog(null, "Impossible De Supprimer (champ invalide ou ID n'existe pas)");
                     inputpiece.setText("");
                     inputpiece.requestFocus();
                 }
@@ -242,7 +279,7 @@ public class Piece {
                 {
                     try
                     {
-                        pst = con.prepareStatement("delete from piece where idepiece = ?");
+                        pst = con.prepareStatement("delete from piece where idpiece = ?");
                         pst.setString(1, id);
                         pst.executeUpdate();
                         JOptionPane.showMessageDialog(null, "Pièce Supprimée !!");
@@ -274,6 +311,7 @@ public class Piece {
                 }
                 else
                 {
+
                     try
                     {
                         pst = con.prepareStatement("select marque,modele,serie,qte,prixunitaire,idfour from piece where idpiece = "+id+";");
@@ -281,11 +319,12 @@ public class Piece {
 
                         while(rs.next())
                         {
-                            marquepiece.setText(rs.getString("nom"));
-                            modelepiece.setText(rs.getString("prenom"));
-                            seriepiece.setText(rs.getString("adresse"));
-                            quantitepiece.setText(rs.getString("mail"));
-                            prixunitairep.setText(rs.getString("salaire"));
+                            marquepiece.setText(rs.getString("marque"));
+                            modelepiece.setText(rs.getString("modele"));
+                            seriepiece.setText(rs.getString("serie"));
+                            quantitepiece.setText(rs.getString("qte"));
+                            prixunitairep.setText(rs.getString("prixunitaire"));
+                            idfourp.setSelectedIndex(indexInListFournisseur(id));
 
                         }
                     }
@@ -304,21 +343,14 @@ public class Piece {
         confBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                /*
-                String [] tabpst = new String[3];
-                for(int i=0; i<3; i++) {
-                    tabpst[i] = PostEmp.getSelectedItem().toString();
-                }
-                 */
-
-                String marque,modele,serie,qte,prixunitaire,idfour, idconf;
+                String marque,modele,serie,qte,prixunitaire, idconf ;
                 idconf = inputpiece.getText().trim();
                 marque = marquepiece.getText().trim();
                 modele = modelepiece.getText().trim();
                 serie = seriepiece.getText().trim();
                 qte = quantitepiece.getText().trim();
                 prixunitaire = prixunitairep.getText().trim();
-                //idfour = tabpst[PostEmp.getSelectedIndex()];
+
 
                 if(ChampEstVide(marque, modele, serie, qte, prixunitaire))
                 {
@@ -327,31 +359,83 @@ public class Piece {
                 }
                 else
                 {
-                    try
+                    if(ChampsIdEstInt(qte)==false)
                     {
-                        pst = con.prepareStatement("update piece set marque = ? , modele = ? , serie = ? , qte = ? , prixunitaire = ?  where idpiece = ? ");
-
-                        pst.setString(1, marque);
-                        pst.setString(2, modele);
-                        pst.setString(3, serie);
-                        pst.setString(4, qte);
-                        pst.setString(5, prixunitaire);
-                        pst.setString(6, idconf);
-                        pst.executeUpdate();
-                        JOptionPane.showMessageDialog(null, "Pièce Modifié !!");
-                        Actualiser();
-                        inputpiece.setText("");
-                        inputpiece.requestFocus();
-
+                        JOptionPane.showMessageDialog(null, "quantité invalide");
+                        quantitepiece.setText("");
+                        quantitepiece.requestFocus();
                     }
-                    catch (SQLException e1)
+                    else
                     {
-                        e1.printStackTrace();
+                        if(QteSupOuEgaleZero(qte) == false)
+                        {
+                            JOptionPane.showMessageDialog(null, "quantité invalide");
+                            quantitepiece.setText("");
+                            quantitepiece.requestFocus();
+                        }
+                        else
+                        {
+                            if(ChampPrixEstDouble(prixunitaire)==false)
+                            {
+                                JOptionPane.showMessageDialog(null, "prix unitaire invalide !!");
+                                prixunitairep.setText("");
+                                prixunitairep.requestFocus();
+                            }
+                            else
+                            {
+                                if(PrixSupZero(prixunitaire) == false)
+                                {
+                                    JOptionPane.showMessageDialog(null, "prix unitaire invalide !!");
+                                    prixunitairep.setText("");
+                                    prixunitairep.requestFocus();
+                                }
+                                else
+                                {
+                                    if(MMSEstUnique(marque, "marque", idconf) || MMSEstUnique(modele, "modele",idconf) || MMSEstUnique(serie, "serie",idconf))
+                                    {
+                                        try
+                                        {
+                                            pst = con.prepareStatement("update piece set marque = ? , modele = ? , serie = ? , qte = ? , prixunitaire = ? , idfour = ? where idpiece = ?");
+                                            pst.setString(1, marque);
+                                            pst.setString(2, modele);
+                                            pst.setString(3, serie);
+                                            pst.setString(4, qte);
+                                            pst.setString(5, prixunitaire);
+                                            pst.setString(6, getIndexFour());
+                                            pst.setString(7, idconf);
+                                            pst.executeUpdate();
+                                            JOptionPane.showMessageDialog(null, "Pièce Modifié !!");
+                                            Actualiser();
+                                            inputpiece.setText("");
+                                            marquepiece.setText("");
+                                            modelepiece.setText("");
+                                            seriepiece.setText("");
+                                            quantitepiece.setText("");
+                                            prixunitairep.setText("");
+                                            inputpiece.requestFocus();
+                                        }
+                                        catch (SQLException e1)
+                                        {
+                                            e1.printStackTrace();
+                                        }
+                                    }
+                                    else
+                                    {
+                                        JOptionPane.showMessageDialog(null, "Marque et Modele et Série Déjà EXIST !!");
+                                        marquepiece.setText("");
+                                        modelepiece.setText("");
+                                        seriepiece.setText("");
+                                        marquepiece.requestFocus();
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }
         });
     }
+
 
     //==============================================================================================
 
@@ -432,26 +516,32 @@ public class Piece {
     //--------------------------id exist---------------------------------
     public boolean IdExist(String id)
     {
-        ArrayList listid = new ArrayList();
+        ArrayList<String> listid = new ArrayList();
         try
         {
             pst = con.prepareStatement("select idpiece from piece");
             ResultSet rs = pst.executeQuery();
 
-            //empiler tabid avec les id à partir de la base de donnée
+
             while(rs.next())
             {
                 listid.add(rs.getString("idpiece"));
             }
 
 
-            for(int j=0; j<listid.size();j++)
+            int i = 0 ;
+            boolean bool = false;
+            while(i<listid.size() || bool == true)
             {
-                if(id.equals(listid.get(j)))
+                if(id.equals(listid.get(i)))
                 {
+                    bool = true;
                     return true;
                 }
+                i++;
             }
+
+            listid.clear();
 
         }
         catch (SQLException e)
@@ -475,7 +565,6 @@ public class Piece {
 
     //-------------- set current user -------------------
     public void setCurrentUser(String currentUser) {
-        System.out.println(currentUser);
         this.currentUser.setText(currentUser);
     }
 
@@ -497,4 +586,118 @@ public class Piece {
             e.printStackTrace();
         }
     }
+
+    //------------------- Marque Serie Modele est UNIQUE Modification----------------------
+    public boolean MMSEstUnique(String mms, String rqt, String id)
+    {
+        ArrayList<String> listMMS = new ArrayList();
+        try
+        {
+            pst = con.prepareStatement("select "+rqt+" from piece where idpiece != '"+id+ "'");
+            ResultSet rs = pst.executeQuery();
+
+
+            while(rs.next())
+            {
+                listMMS.add(rs.getString(rqt));
+            }
+
+
+            int i = 0 ;
+            boolean bool = false;
+            while(i<listMMS.size() || bool == true)
+            {
+                if(mms.equals(listMMS.get(i))) // l9a mms fi base donc mahich unique
+                {
+                    bool = true;
+                    return false;
+                }
+                i++;
+            }
+
+            listMMS.clear();
+
+        }
+        catch (SQLException e)
+        {
+            e.printStackTrace();
+        }
+        return true; //donc unique eli jebeteha en para
+    }
+    //------------------- Marque Serie Modele est UNIQUE----------------------
+    public boolean MMSEstUnique(String mms, String rqt)
+    {
+        ArrayList<String> listMMS = new ArrayList();
+        try
+        {
+            pst = con.prepareStatement("select "+rqt+" from piece");
+            ResultSet rs = pst.executeQuery();
+
+
+            while(rs.next())
+            {
+                listMMS.add(rs.getString(rqt));
+            }
+
+
+            int i = 0 ;
+            boolean bool = false;
+            while(i<listMMS.size() || bool == true)
+            {
+                if(mms.equals(listMMS.get(i))) // l9a mms fi base donc mahich unique
+                {
+                    bool = true;
+                    return false;
+                }
+                i++;
+            }
+
+            listMMS.clear();
+
+        }
+        catch (SQLException e)
+        {
+            e.printStackTrace();
+        }
+        return true; //donc unique eli jebeteha en para
+    }
+
+
+    //---------------------- indexInList de la fournisseur selon id piece---------------
+    public int indexInListFournisseur(String id)
+    {
+        try
+        {
+            //bech yjib juste (idfour) piece mte3 id
+            pst = con.prepareStatement("select idfour from piece where idpiece = "+id);
+            ResultSet rs1 = pst.executeQuery();
+            String s ="";
+            while (rs1.next())
+            {
+                s = rs1.getString("idfour");
+            }
+
+            //bech yjib les pieces lkol w yee9if aand id
+            ArrayList<String> idfo = new ArrayList<>();
+            pst = con.prepareStatement("select idfour from piece");
+            ResultSet rs = pst.executeQuery();
+            while (rs.next())
+            {
+                idfo.add(rs.getString("idfour"));
+                if(rs.getString("idfour").equals(s))
+                {
+                    return idfo.indexOf(s);
+                }
+            }
+
+            idfo.clear();
+        }
+        catch (SQLException ex)
+        {
+            ex.printStackTrace();
+        }
+        return 0;
+    }
+
+
 }

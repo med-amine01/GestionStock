@@ -185,24 +185,26 @@ public class Employe {
                 }
                 else
                 {
-                    try
+                    if(IdExist(rech)==false)
                     {
-                        pst = con.prepareStatement("select idemp,nom,prenom,adresse,mail,salaire,post from employe where idemp like '"+rech+"%' or nom like '"+rech+"%'" +
-                                "or prenom like '"+rech+"%' or adresse like '"+rech+"%' or salaire like '"+rech+"%' or post like '"+rech+"%'");
-                        ResultSet rs = pst.executeQuery();
-                        table1.setModel(DbUtils.resultSetToTableModel(rs));
-
-                        //System.out.println(table1.getRowCount());
-
-                        if(table1.getRowCount() == 0)
-                        {
-                            JOptionPane.showMessageDialog(null, "Non Trouvé");
-                        }
-
+                        JOptionPane.showMessageDialog(null, "ID n'existe pas !!");
+                        inputEmp.setText("");
+                        inputEmp.requestFocus();
                     }
-                    catch (SQLException ex)
+                    else
                     {
-                        ex.printStackTrace();
+                        try
+                        {
+                            pst = con.prepareStatement("select idemp,nom,prenom,adresse,mail,salaire,post from employe where idemp like '"+rech+"%' or nom like '"+rech+"%'" +
+                                    "or prenom like '"+rech+"%' or adresse like '"+rech+"%' or salaire like '"+rech+"%' or post like '"+rech+"%'");
+                            ResultSet rs = pst.executeQuery();
+                            table1.setModel(DbUtils.resultSetToTableModel(rs));
+
+                        }
+                        catch (SQLException ex)
+                        {
+                            ex.printStackTrace();
+                        }
                     }
                 }
             }
@@ -594,7 +596,6 @@ public class Employe {
 
     //-------------- set current user -------------------
     public void setCurrentUser(String currentUser) {
-        System.out.println(currentUser);
         this.currentUser.setText(currentUser);
     }
 }

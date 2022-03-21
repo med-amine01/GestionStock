@@ -268,23 +268,26 @@ public class Fournisseur {
                 }
                 else
                 {
-                    try
+                    if(IdExist(rech)==false)
                     {
-                        pst = con.prepareStatement("select idfour,nom,adresse,tel,mail from fournisseur where idfour like '"+rech+"%' or nom like '"+rech+"%'" +
-                                "or adresse like '"+rech+"%' or mail like '"+rech+"%'");
-                        ResultSet rs = pst.executeQuery();
-                        table1.setModel(DbUtils.resultSetToTableModel(rs));
-
-
-                        if(table1.getRowCount() == 0)
-                        {
-                            JOptionPane.showMessageDialog(null, "Non Trouvé");
-                        }
-
+                        JOptionPane.showMessageDialog(null, "ID n'existe pas !!");
+                        inputFour.setText("");
+                        inputFour.requestFocus();
                     }
-                    catch (SQLException ex)
+                    else
                     {
-                        ex.printStackTrace();
+                        try
+                        {
+                            pst = con.prepareStatement("select idfour,nom,adresse,tel,mail from fournisseur where idfour like '"+rech+"%' or nom like '"+rech+"%'" +
+                                    "or adresse like '"+rech+"%' or mail like '"+rech+"%'");
+                            ResultSet rs = pst.executeQuery();
+                            table1.setModel(DbUtils.resultSetToTableModel(rs));
+
+                        }
+                        catch (SQLException ex)
+                        {
+                            ex.printStackTrace();
+                        }
                     }
                 }
             }
@@ -624,7 +627,6 @@ public class Fournisseur {
     }
     //-------------- set current user -------------------
     public void setCurrentUser(String currentUser) {
-        System.out.println(currentUser);
         this.currentUser.setText(currentUser);
     }
 
