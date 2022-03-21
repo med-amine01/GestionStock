@@ -122,7 +122,7 @@ public class Employe {
                 }
                 else
                 {
-                    if(!MailEstUnique(mail) || !valideMail(mail))
+                    if(!MailEstUniqueAjout(mail) || !valideMail(mail))
                     {
                         JOptionPane.showMessageDialog(null, "L'employé Déjà Existe ou  mail invalide");
                         mailEmp.setText("");
@@ -170,7 +170,6 @@ public class Employe {
             }
         });
     }
-
 
     //----------------------- Rechercher et afficher ------------------------
     public void Rechercher()
@@ -244,53 +243,6 @@ public class Employe {
         });
     }
 
-    //----------------------------id chiffres-----------------------------
-    public boolean ChampsIdEstInt(String champsId)
-    {
-        boolean b = false ;
-        try
-        {
-            Integer.parseInt(champsId);
-            b = true;
-        }
-        catch(NumberFormatException e)
-        {
-            b = false;
-        }
-        return b;
-    }
-
-    //--------------------------id exist---------------------------------
-    public boolean IdExist(String id)
-    {
-        ArrayList listid = new ArrayList();
-        try
-        {
-            pst = con.prepareStatement("select idemp from employe");
-            ResultSet rs = pst.executeQuery();
-
-            //empiler tabid avec les id à partir de la base de donnée
-            while(rs.next())
-            {
-                listid.add(rs.getString("idemp"));
-            }
-
-
-            for(int j=0; j<listid.size();j++)
-            {
-                if(id.equals(listid.get(j)))
-                {
-                    return true;
-                }
-            }
-
-        }
-        catch (SQLException e)
-        {
-            e.printStackTrace();
-        }
-        return false;
-    }
     //-----------------UPDATE EMPLOYE-------------------------------
     public void Modifier()
     {
@@ -375,34 +327,104 @@ public class Employe {
                 }
                 else
                 {
-                    try
+                    if(!MailEstUnique(mail,idconf) || !valideMail(mail))
                     {
-                        pst = con.prepareStatement("update employe set nom = ? , prenom = ? , adresse = ? , mail = ? , salaire = ? , post = ? , password = ? where idemp = ? ");
-
-                        pst.setString(1, nom);
-                        pst.setString(2, prenom);
-                        pst.setString(3, adresse);
-                        pst.setString(4, mail);
-                        pst.setString(5, salaire);
-                        pst.setString(6, post);
-                        pst.setString(7, password);
-                        pst.setString(8, idconf);
-                        pst.executeUpdate();
-                        JOptionPane.showMessageDialog(null, "Employé Modifié !!");
-                        Actualiser();
-                        inputEmp.setText("");
-                        inputEmp.requestFocus();
-
+                        JOptionPane.showMessageDialog(null, "L'employé Déjà Existe ou  mail invalide");
+                        mailEmp.setText("");
+                        mailEmp.requestFocus();
                     }
-                    catch (SQLException e1)
+                    else
                     {
-                        e1.printStackTrace();
+                        if (!ChampSalaireEstDouble(salaire))
+                        {
+                            JOptionPane.showMessageDialog(null, "Verifiez Le salaire !!");
+                            salEmp.setText("");
+                            salEmp.requestFocus();
+                        }
+                        else
+                        {
+                            try
+                            {
+                                pst = con.prepareStatement("update employe set nom = ? , prenom = ? , adresse = ? , mail = ? , salaire = ? , post = ? , password = ? where idemp = ? ");
+                                pst.setString(1, nom);
+                                pst.setString(2, prenom);
+                                pst.setString(3, adresse);
+                                pst.setString(4, mail);
+                                pst.setString(5, salaire);
+                                pst.setString(6, post);
+                                pst.setString(7, password);
+                                pst.setString(8, idconf);
+                                pst.executeUpdate();
+                                JOptionPane.showMessageDialog(null, "Employé Modifié !!");
+                                Actualiser();
+                                inputEmp.requestFocus();
+
+                            }
+                            catch (SQLException e1)
+                            {
+                                e1.printStackTrace();
+                            }
+                        }
                     }
                 }
             }
         });
     }
 
+
+    //================================================================================
+
+    //----------------------------id chiffres-----------------------------
+    public boolean ChampsIdEstInt(String champsId)
+    {
+        boolean b = false ;
+        try
+        {
+            Integer.parseInt(champsId);
+            b = true;
+        }
+        catch(NumberFormatException e)
+        {
+            b = false;
+        }
+        return b;
+    }
+
+    //--------------------------id exist---------------------------------
+    public boolean IdExist(String id)
+    {
+        ArrayList listid = new ArrayList();
+        try
+        {
+            pst = con.prepareStatement("select idemp from employe");
+            ResultSet rs = pst.executeQuery();
+
+            //empiler tabid avec les id à partir de la base de donnée
+            while(rs.next())
+            {
+                listid.add(rs.getString("idemp"));
+            }
+
+
+            int i = 0 ;
+            boolean bool = false;
+            while(i<listid.size() || bool == true)
+            {
+                if(id.equals(listid.get(i)))
+                {
+                    bool = true;
+                    return true;
+                }
+                i++;
+            }
+
+        }
+        catch (SQLException e)
+        {
+            e.printStackTrace();
+        }
+        return false;
+    }
 
     //------------------------------- verification tous les champs ----------------------------
     public boolean ChampEstVide(String...champs)
@@ -440,13 +462,13 @@ public class Employe {
     }
 
 
-    //-------------------- mail unique et chargement -------------------
-    public boolean MailEstUnique(String inputMail)
+    //-------------------- mail unique -------------------------
+    public boolean MailEstUnique(String inputMail, String id)
     {
         ArrayList listmail = new ArrayList();
         try
         {
-            pst = con.prepareStatement("select mail from employe");
+            pst = con.prepareStatement("select mail from employe where idemp != '"+id+"'");
             ResultSet rs = pst.executeQuery();
 
             //empiler tabmail avec les mail à partir de la base de donnée
@@ -454,23 +476,62 @@ public class Employe {
             {
                 listmail.add(rs.getString("mail"));
             }
-            //System.out.println(listmail);
-            //table1.setModel(DbUtils.resultSetToTableModel(rs));
 
-            for(int j=0; j<listmail.size();j++)
+            int i = 0 ;
+            boolean bool = false;
+            while(i<listmail.size() || bool == true)
             {
-                if(inputMail.equals(listmail.get(j)))
+                if(inputMail.equals(listmail.get(i)))
                 {
+                    bool = true;
                     return false;
                 }
+                i++;
             }
 
+            listmail.clear();
         }
         catch (SQLException e)
         {
             e.printStackTrace();
         }
-        return true;
+        return true ;
+    }
+
+    //-------------------- mail unique pour l'ajout -------------------
+    public boolean MailEstUniqueAjout(String inputMail)
+    {
+        ArrayList listmail = new ArrayList();
+        try
+        {
+            pst = con.prepareStatement("select mail from employe ");
+            ResultSet rs = pst.executeQuery();
+
+            //empiler tabmail avec les mail à partir de la base de donnée
+            while(rs.next())
+            {
+                listmail.add(rs.getString("mail"));
+            }
+
+            int i = 0 ;
+            boolean bool = false;
+            while(i<listmail.size() || bool == true)
+            {
+                if(inputMail.equals(listmail.get(i)))
+                {
+                    bool = true;
+                    return false;
+                }
+                i++;
+            }
+
+            listmail.clear();
+        }
+        catch (SQLException e)
+        {
+            e.printStackTrace();
+        }
+        return true ;
     }
 
     //----------------------- mail form ---------------------------

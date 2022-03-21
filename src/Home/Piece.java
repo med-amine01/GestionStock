@@ -42,6 +42,7 @@ public class Piece {
 
         setCurrentUser(NomCurrentUser);
         connect();
+        setListeDeroulante();
         Actualiser();
         AjouterPiece();
         Rechercher();
@@ -89,6 +90,7 @@ public class Piece {
             e.printStackTrace();
         }
     }
+
     //--------------------------------AJOUTER PIECE----------------------------
     public void AjouterPiece()
     {
@@ -97,31 +99,34 @@ public class Piece {
             public void actionPerformed(ActionEvent e) {
 
 
-                /*
-                String [] tabfour = new String[3];
-                for(int i=0; i<3; i++) {
-                    tabfour[i] = idfourp.getSelectedItem().toString();
+                idfourp.setSelectedIndex(0);
+                ArrayList<String> listIDfour = new ArrayList();
+                int i = 0 ;
+                while (i<idfourp.getItemCount())
+                {
+                    listIDfour.add(idfourp.getSelectedItem().toString());
+                    i++;
                 }
-                 */
 
-                String marque,modele,serie,qte,prixunitaire,idfour;
+
+                String marque,modele,serie,qte,prixunitaire,idfour ;
                 marque = marquepiece.getText().trim();
                 modele = modelepiece.getText().trim();
                 serie = seriepiece.getText().trim();
                 qte = quantitepiece.getText().trim();
                 prixunitaire = prixunitairep.getText().trim();
-                //idfour = tabfour[idfourp.getSelectedIndex()];
+                idfour = listIDfour.get(idfourp.getSelectedIndex());
 
 
 
-                if(ChampEstVide(marque,modele,serie,qte,prixunitaire)==true)
+                if(ChampEstVide(marque, modele, serie, qte, prixunitaire))
                 {
                     JOptionPane.showMessageDialog(null, "Verifiez Les Champs !!");
                     marquepiece.requestFocus();
                 }
                 else
                 {
-                    if((ChampsIdEstInt(qte)==false) || (qte=="0"))
+                    if(ChampsIdEstInt(qte)==false)
                     {
                         JOptionPane.showMessageDialog(null, "quantité invalide");
                         quantitepiece.setText("");
@@ -129,89 +134,62 @@ public class Piece {
                     }
                     else
                     {
-                        if(ChampPrixEstDouble(prixunitaire)==false)
+                        if(QteSupOuEgaleZero(qte) == false)
                         {
-                            JOptionPane.showMessageDialog(null, "prix unitaire invalide !!");
-                            prixunitairep.setText("");
-                            prixunitairep.requestFocus();
+                            JOptionPane.showMessageDialog(null, "quantité invalide");
+                            quantitepiece.setText("");
+                            quantitepiece.requestFocus();
                         }
                         else
                         {
-                            try
+                            if(ChampPrixEstDouble(prixunitaire)==false)
                             {
-                                pst = con.prepareStatement("insert into piece (marque,modele,serie,qte,prixunitaire) values (?,?,?,?,?)");
-                                pst.setString(1, marque);
-                                pst.setString(2, modele);
-                                pst.setString(3, serie);
-                                pst.setString(4, qte);
-                                pst.setString(5, prixunitaire);
-                                pst.executeUpdate();
-                                JOptionPane.showMessageDialog(null, "pièce Ajoutée !!");
-                                Actualiser();
-                                marquepiece.setText("");
-                                modelepiece.setText("");
-                                seriepiece.setText("");
-                                quantitepiece.setText("");
+                                JOptionPane.showMessageDialog(null, "prix unitaire invalide !!");
                                 prixunitairep.setText("");
+                                prixunitairep.requestFocus();
                             }
-                            catch (SQLException e1)
+                            else
                             {
-                                e1.printStackTrace();
+                                if(PrixSupZero(prixunitaire) == false)
+                                {
+                                    JOptionPane.showMessageDialog(null, "prix unitaire invalide !!");
+                                    prixunitairep.setText("");
+                                    prixunitairep.requestFocus();
+                                }
+                                else
+                                {
+                                    try
+                                    {
+                                        pst = con.prepareStatement("insert into piece (marque,modele,serie,qte,prixunitaire,idfour) values (?,?,?,?,?,?)");
+                                        pst.setString(1, marque);
+                                        pst.setString(2, modele);
+                                        pst.setString(3, serie);
+                                        pst.setString(4, qte);
+                                        pst.setString(5, prixunitaire);
+                                        pst.setString(6, idfour);
+                                        pst.executeUpdate();
+                                        JOptionPane.showMessageDialog(null, "pièce Ajoutée !!");
+                                        Actualiser();
+                                        marquepiece.setText("");
+                                        modelepiece.setText("");
+                                        seriepiece.setText("");
+                                        quantitepiece.setText("");
+                                        prixunitairep.setText("");
+                                    }
+                                    catch (SQLException e1)
+                                    {
+                                        e1.printStackTrace();
+                                    }
+                                }
                             }
                         }
                     }
                 }
+                listIDfour.clear();
             }
         });
     }
-    //------------------------------- verification tous les champs ----------------------------
-    public boolean ChampEstVide(String...champs)
-    {
-        boolean b = false;
-        for(String ch : champs)
-        {
-            if(ch.length() == 0)
-            {
-                b = true;
-                break;
-            }
-            else
-            {
-                b = false;
-            }
-        }
-        return b;
-    }
-    //----------------------------id chiffres-----------------------------
-    public boolean ChampsIdEstInt(String champsId)
-    {
-        boolean b = false ;
-        try
-        {
-            Integer.parseInt(champsId);
-            b = true;
-        }
-        catch(NumberFormatException e)
-        {
-            b = false;
-        }
-        return b;
-    }
-    //------------------------- verification champ prixunitaire ----------------------
-    public boolean ChampPrixEstDouble(String prix)
-    {
-        boolean b = false ;
-        try
-        {
-            Double.parseDouble(prix);
-            b = true;
-        }
-        catch(NumberFormatException e)
-        {
-            b = false;
-        }
-        return b;
-    }
+
     //----------------------- Rechercher et afficher ------------------------
     public void Rechercher()
     {
@@ -246,6 +224,7 @@ public class Piece {
             }
         });
     }
+
     //---------------------SUPPRIMER PIECE----------------------------------
     public void Supprimer()
     {
@@ -279,37 +258,7 @@ public class Piece {
             }
         });
     }
-    //--------------------------id exist---------------------------------
-    public boolean IdExist(String id)
-    {
-        ArrayList listid = new ArrayList();
-        try
-        {
-            pst = con.prepareStatement("select idpiece from piece");
-            ResultSet rs = pst.executeQuery();
 
-            //empiler tabid avec les id à partir de la base de donnée
-            while(rs.next())
-            {
-                listid.add(rs.getString("idpiece"));
-            }
-
-
-            for(int j=0; j<listid.size();j++)
-            {
-                if(id.equals(listid.get(j)))
-                {
-                    return true;
-                }
-            }
-
-        }
-        catch (SQLException e)
-        {
-            e.printStackTrace();
-        }
-        return false;
-    }
     //-----------------UPDATE PIECE-------------------------------
     public void Modifier()
     {
@@ -348,6 +297,7 @@ public class Piece {
             }
         });
     }
+
     //------------------ Confirmer Modification ------------------------
     public void Confirme()
     {
@@ -402,7 +352,116 @@ public class Piece {
             }
         });
     }
-    //------------ retour -------------
+
+    //==============================================================================================
+
+
+    //------------------------------- verification tous les champs ----------------------------
+    public boolean ChampEstVide(String...champs)
+    {
+        boolean b = false;
+        for(String ch : champs)
+        {
+            if(ch.length() == 0)
+            {
+                b = true;
+                break;
+            }
+            else
+            {
+                b = false;
+            }
+        }
+        return b;
+    }
+
+    //----------------------------id chiffres-----------------------------
+    public boolean ChampsIdEstInt(String champsId)
+    {
+        boolean b = false ;
+        try
+        {
+            Integer.parseInt(champsId);
+            b = true;
+        }
+        catch(NumberFormatException e)
+        {
+            b = false;
+        }
+        return b;
+    }
+
+    //-------------------------- Champ qte ---------------------
+    public boolean QteSupOuEgaleZero(String champsId)
+    {
+        int qte = Integer.parseInt(champsId);
+        if(qte >= 0)
+        {
+            return true;
+        }
+        return false;
+    }
+
+    //-------------------------- Champ prix ---------------------
+    public boolean PrixSupZero(String champsId)
+    {
+        double prix = Double.parseDouble(champsId);
+        if(prix > 0.0)
+        {
+            return true;
+        }
+        return false;
+    }
+
+    //------------------------- verification champ prixunitaire ----------------------
+    public boolean ChampPrixEstDouble(String prix)
+    {
+        boolean b = false ;
+        try
+        {
+            Double.parseDouble(prix);
+            b = true;
+        }
+        catch(NumberFormatException e)
+        {
+            b = false;
+        }
+        return b;
+    }
+
+    //--------------------------id exist---------------------------------
+    public boolean IdExist(String id)
+    {
+        ArrayList listid = new ArrayList();
+        try
+        {
+            pst = con.prepareStatement("select idpiece from piece");
+            ResultSet rs = pst.executeQuery();
+
+            //empiler tabid avec les id à partir de la base de donnée
+            while(rs.next())
+            {
+                listid.add(rs.getString("idpiece"));
+            }
+
+
+            for(int j=0; j<listid.size();j++)
+            {
+                if(id.equals(listid.get(j)))
+                {
+                    return true;
+                }
+            }
+
+        }
+        catch (SQLException e)
+        {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    //------------------- retour -------------
     public void RetourMainListChoix(String user)
     {
         retBtn.addActionListener(new ActionListener() {
@@ -413,9 +472,29 @@ public class Piece {
             }
         });
     }
+
     //-------------- set current user -------------------
     public void setCurrentUser(String currentUser) {
         System.out.println(currentUser);
         this.currentUser.setText(currentUser);
+    }
+
+    //------------------------ list déroulante ------------------
+    public void setListeDeroulante()
+    {
+        try {
+            pst = con.prepareStatement("select idfour from fournisseur");
+            ResultSet rs = pst.executeQuery();
+
+
+            while (rs.next())
+            {
+                idfourp.addItem(rs.getString("idfour"));
+            }
+        }
+        catch (SQLException e)
+        {
+            e.printStackTrace();
+        }
     }
 }

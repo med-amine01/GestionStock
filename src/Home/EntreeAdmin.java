@@ -221,62 +221,62 @@ public class EntreeAdmin {
         return false;
     }
     //------------------ Confirmer Modification ------------------------
-    public void Confirme()
-    {
-        confBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-
-                /*
-                String [] tabpst = new String[3];
-                for(int i=0; i<3; i++) {
-                    tabpst[i] = PostEmp.getSelectedItem().toString();
-                }
-                 */
-
-                String qte,date,montant,post,idconf;
-                idconf = inputEntreeAdmin.getText().trim();
-                qte = qteentree.getText().trim();
-                date = dateentree.getText().trim();
-                montant = montantentree.getText().trim();
-                //post = tabpst[PostEmp.getSelectedIndex()];
-
-
-
-                if(ChampEstVide(qte, date, montant))
-                {
-                    JOptionPane.showMessageDialog(null, "Verifiez Les Champs !!");
-                    qteentree.requestFocus();
-                }
-                else
-                {
-                    try
-                    {
-                        pst = con.prepareStatement("update entree set nom = ? , prenom = ? , adresse = ? , mail = ? , salaire = ? , post = ? , password = ? where idemp = ? ");
-
-                        pst.setString(1, nom);
-                        pst.setString(2, prenom);
-                        pst.setString(3, adresse);
-                        pst.setString(4, mail);
-                        pst.setString(5, salaire);
-                        pst.setString(6, post);
-                        pst.setString(7, password);
-                        pst.setString(8, idconf);
-                        pst.executeUpdate();
-                        JOptionPane.showMessageDialog(null, "Employé Modifié !!");
-                        Actualiser();
-                        inputEmp.setText("");
-                        inputEmp.requestFocus();
-
-                    }
-                    catch (SQLException e1)
-                    {
-                        e1.printStackTrace();
-                    }
-                }
-            }
-        });
-    }
+//    public void Confirme()
+//    {
+//        confBtn.addActionListener(new ActionListener() {
+//            @Override
+//            public void actionPerformed(ActionEvent e) {
+//
+//                /*
+//                String [] tabpst = new String[3];
+//                for(int i=0; i<3; i++) {
+//                    tabpst[i] = PostEmp.getSelectedItem().toString();
+//                }
+//                 */
+//
+//                String qte,date,montant,post,idconf;
+//                idconf = inputEntreeAdmin.getText().trim();
+//                qte = qteentree.getText().trim();
+//                date = dateentree.getText().trim();
+//                montant = montantentree.getText().trim();
+//                //post = tabpst[PostEmp.getSelectedIndex()];
+//
+//
+//
+//                if(ChampEstVide(qte, date, montant))
+//                {
+//                    JOptionPane.showMessageDialog(null, "Verifiez Les Champs !!");
+//                    qteentree.requestFocus();
+//                }
+//                else
+//                {
+//                    try
+//                    {
+//                        pst = con.prepareStatement("update entree set nom = ? , prenom = ? , adresse = ? , mail = ? , salaire = ? , post = ? , password = ? where idemp = ? ");
+//
+//                        pst.setString(1, nom);
+//                        pst.setString(2, prenom);
+//                        pst.setString(3, adresse);
+//                        pst.setString(4, mail);
+//                        pst.setString(5, salaire);
+//                        pst.setString(6, post);
+//                        pst.setString(7, password);
+//                        pst.setString(8, idconf);
+//                        pst.executeUpdate();
+//                        JOptionPane.showMessageDialog(null, "Employé Modifié !!");
+//                        Actualiser();
+//                        inputEmp.setText("");
+//                        inputEmp.requestFocus();
+//
+//                    }
+//                    catch (SQLException e1)
+//                    {
+//                        e1.printStackTrace();
+//                    }
+//                }
+//            }
+//        });
+//    }
     //------------------------------- verification tous les champs ----------------------------
     public boolean ChampEstVide(String...champs)
     {
