@@ -28,11 +28,12 @@ public class Piece {
 
 
     private String indexFour;
-    public String getIndexFour() {
+    public String getIndexFour()
+    {
         return indexFour;
     }
-
-    public void setIndexFour(String indexFour) {
+    public void setIndexFour(String indexFour)
+    {
         this.indexFour = indexFour;
     }
 
@@ -325,7 +326,6 @@ public class Piece {
                             quantitepiece.setText(rs.getString("qte"));
                             prixunitairep.setText(rs.getString("prixunitaire"));
                             idfourp.setSelectedIndex(indexInListFournisseur(id));
-
                         }
                     }
                     catch (SQLException e1)
@@ -350,7 +350,6 @@ public class Piece {
                 serie = seriepiece.getText().trim();
                 qte = quantitepiece.getText().trim();
                 prixunitaire = prixunitairep.getText().trim();
-
 
                 if(ChampEstVide(marque, modele, serie, qte, prixunitaire))
                 {
@@ -564,7 +563,8 @@ public class Piece {
     }
 
     //-------------- set current user -------------------
-    public void setCurrentUser(String currentUser) {
+    public void setCurrentUser(String currentUser)
+    {
         this.currentUser.setText(currentUser);
     }
 
@@ -663,7 +663,7 @@ public class Piece {
     }
 
 
-    //---------------------- indexInList de la fournisseur selon id piece---------------
+    //---------------------- indexInList du fournisseur selon id piece---------------
     public int indexInListFournisseur(String id)
     {
         try
@@ -699,5 +699,5 @@ public class Piece {
         return 0;
     }
 
-
+//
 }

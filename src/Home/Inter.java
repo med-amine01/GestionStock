@@ -31,10 +31,10 @@ public class Inter {
 
         GererEmploye(NomCurrentUser);
         GererFournisseur(NomCurrentUser);
-//        GererClient(NomCurrentUser);
+        GererClient(NomCurrentUser);
         GererPiece(NomCurrentUser);
-//        GererEntree(NomCurrentUser);
-//        GererSortie(NomCurrentUser);
+        GererEntree(NomCurrentUser);
+        GererSortie(NomCurrentUser);
         Deconnexion();
 
     }
@@ -126,5 +126,5 @@ public class Inter {
 
     }
 
-
+//
 }

@@ -85,7 +85,7 @@ public class Login {
                             pst = con.prepareStatement("select idemp, password, post , nom from employe where idemp = "+id+";");
                             ResultSet rs = pst.executeQuery();
 
-                            while(rs.next()) //parcours sur les ids et pass
+                            while(rs.next()) //parcours sur les ids et passwd
                             {
                                 if(rs.getString("idemp").equals(id) && crypte(pwd).equals(rs.getString("password"))) //les champs valides (auth)
                                 {
@@ -97,7 +97,7 @@ public class Login {
                                             pst = con.prepareStatement("select tentative from employe where idemp = "+id+";");
                                             ResultSet rs1 = pst.executeQuery(); // tentative
 
-                                            while(rs1.next()) //parcous sur les tentatives
+                                            while(rs1.next()) //parcours sur les tentatives
                                             {
 
                                                 if(rs1.getString("tentative").equals("0"))
@@ -120,14 +120,14 @@ public class Login {
 
 
                                     //========================================== STOCK ==================================================
-                                    if(rs.getString("post").equals("Stock")) // get poste employe (STOCK)
+                                    if(rs.getString("post").equals("Stock"))
                                     {
                                         try
                                         {
                                             pst = con.prepareStatement("select tentative from employe where idemp = "+id+";");
                                             ResultSet rs2 = pst.executeQuery();
 
-                                            while(rs2.next()) //parcous sur les tentatives
+                                            while(rs2.next()) //parcours sur les tentatives
                                             {
                                                 System.out.println(rs2.getString("tentative"));
 
@@ -138,7 +138,7 @@ public class Login {
                                                 else
                                                 {
                                                     JOptionPane.showMessageDialog(null, "Authentifié Stock");
-                                                    StockWindow(rs2.getString("idemp"));
+                                                    StockWindow(id);
                                                     frameLogin.dispose();
                                                 }
                                             }
@@ -151,14 +151,14 @@ public class Login {
 
 
                                     //=================================== Vendeur =====================================================
-                                    if(rs.getString("post").equals("Vendeur")) // get poste employe (admin)
+                                    if(rs.getString("post").equals("Vendeur"))
                                     {
                                         try
                                         {
                                             pst = con.prepareStatement("select tentative from employe where idemp = "+id+";");
                                             ResultSet rs3 = pst.executeQuery();
 
-                                            while(rs3.next()) //parcous sur les tentatives
+                                            while(rs3.next()) //parcours sur les tentatives
                                             {
                                                 if(rs3.getString("tentative").equals("0"))
                                                 {
@@ -167,7 +167,7 @@ public class Login {
                                                 else
                                                 {
                                                     JOptionPane.showMessageDialog(null, "Authentifié Vendeur");
-                                                    VendeurWindow(rs3.getString("idemp"));
+                                                    VendeurWindow(id);
                                                     frameLogin.dispose();
                                                 }
                                             }
@@ -211,6 +211,7 @@ public class Login {
         }
         return b;
     }
+
     //--------------------------id exist---------------------------------
     public boolean IdExist(String id)
     {
@@ -242,6 +243,7 @@ public class Login {
         }
         return false;
     }
+
     //------------------------------- verification tous les champs ----------------------------
     public boolean ChampEstVide(String...champs)
     {
@@ -298,17 +300,19 @@ public class Login {
                 if(post.equals("ADMIN"))
                 {
                     AdminWindow(CurentUser);
-                    //frameLog.dispose();
+                    frameLogin.dispose();
                 }
                 // stock window
                 if(post.equals("Stock"))
                 {
-                    //AdminWindow();
+                    StockWindow(CurentUser);
+                    frameLogin.dispose();
                 }
                 //vendeur window
                 if(post.equals("Vendeur"))
                 {
-                    //AdminWindow();
+                    VendeurWindow(CurentUser);
+                    frameLogin.dispose();
                 }
             }
             catch (SQLException ex)
@@ -321,10 +325,8 @@ public class Login {
     //---------------- ADMIN WINDOW -----------------
     public void AdminWindow(String CurrentUser)
     {
-        //System.out.println("ADMIN WINDOW");
         new Inter(CurrentUser);
     }
-
 
     //------------------ Stock WINDOW -----------------------
     public void StockWindow(String idemp)
@@ -338,4 +340,5 @@ public class Login {
         new Sortie(vendid);
     }
 
+    //
 }

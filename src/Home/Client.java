@@ -48,7 +48,6 @@ public class Client {
         Confirme();
         RetourMainListChoix(NomCurrentUser);
 
-
     }
 
 
@@ -71,6 +70,7 @@ public class Client {
             ex.printStackTrace();
         }
     }
+
     //---------------------- chargement du tableau -----------------------------
     public void Actualiser()
     {
@@ -87,6 +87,7 @@ public class Client {
             e.printStackTrace();
         }
     }
+
     //--------------------------------AJOUTER CLIENT----------------------------
     public void AjouterClient()
     {
@@ -142,6 +143,171 @@ public class Client {
         });
     }
 
+    //----------------------- Rechercher et afficher ------------------------
+    public void Rechercher()
+    {
+        rechBtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String rech = inputClient.getText().trim();
+                if(rech.equals(""))
+                {
+                    Actualiser();
+                }
+                else
+                {
+                    try
+                    {
+                        pst = con.prepareStatement("select idclient,nom,prenom,adresse,mail from client where idclient like '"+rech+"%' or nom like '"+rech+"%'" +
+                                "or prenom like '"+rech+"%' or adresse like '"+rech+"%'");
+                        ResultSet rs = pst.executeQuery();
+                        table1.setModel(DbUtils.resultSetToTableModel(rs));
+
+                        //System.out.println(table1.getRowCount());
+
+                        if(table1.getRowCount() == 0)
+                        {
+                            JOptionPane.showMessageDialog(null, "Non Trouvé");
+                        }
+
+                    }
+                    catch (SQLException ex)
+                    {
+                        ex.printStackTrace();
+                    }
+                }
+            }
+        });
+    }
+
+    //---------------------SUPPRIMER CLIENT----------------------------------
+    public void Supprimer()
+    {
+        suppBtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String id=inputClient.getText();
+                if(ChampsIdEstInt(id)==false || IdExist(id)==false)
+                {
+                    JOptionPane.showMessageDialog(null, "Impossible De Supprimer");
+                    inputClient.setText("");
+                    inputClient.requestFocus();
+                }
+                else
+                {
+                    try
+                    {
+                        pst = con.prepareStatement("delete from client where idclient = ?");
+                        pst.setString(1, id);
+                        pst.executeUpdate();
+                        JOptionPane.showMessageDialog(null, "client Supprimé !!");
+                        Actualiser();
+                        inputClient.setText("");
+                        inputClient.requestFocus();
+                    }
+                    catch (SQLException e1)
+                    {
+                        e1.printStackTrace();
+                    }
+                }
+            }
+        });
+    }
+
+    //-----------------UPDATE CLIENT-------------------------------
+    public void Modifier()
+    {
+        modifBtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String id=inputClient.getText();
+                if(ChampsIdEstInt(id)==false || IdExist(id)==false)
+                {
+                    JOptionPane.showMessageDialog(null, "Impossible De Modifier (id invalide)");
+                    inputClient.setText("");
+                    inputClient.requestFocus();
+                }
+                else
+                {
+                    try
+                    {
+                        pst = con.prepareStatement("select nom,prenom,adresse,mail from client where idclient = "+id+";");
+                        ResultSet rs = pst.executeQuery();
+
+                        while(rs.next())
+                        {
+                            nomclient.setText(rs.getString("nom"));
+                            prenomclient.setText(rs.getString("prenom"));
+                            adresseclient.setText(rs.getString("adresse"));
+                            mailclient.setText(rs.getString("mail"));
+
+                        }
+                    }
+                    catch (SQLException e1)
+                    {
+                        e1.printStackTrace();
+                    }
+                }
+            }
+        });
+    }
+
+    //------------------ Confirmer Modification ------------------------
+    public void Confirme()
+    {
+        confBtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                String nom,prenom,adresse,mail, idconf;
+                idconf = inputClient.getText().trim();
+                nom = nomclient.getText().trim();
+                prenom = prenomclient.getText().trim();
+                adresse = adresseclient.getText().trim();
+                mail = mailclient.getText().trim();
+
+
+                if(ChampEstVide(nom, prenom, adresse, mail))
+                {
+                    JOptionPane.showMessageDialog(null, "Verifiez Les Champs !!");
+                    nomclient.requestFocus();
+                }
+                else
+                {
+                    try
+                    {
+                        pst = con.prepareStatement("update client set nom = ? , prenom = ? , adresse = ? , mail = ?  where idclient = ? ");
+
+                        pst.setString(1, nom);
+                        pst.setString(2, prenom);
+                        pst.setString(3, adresse);
+                        pst.setString(4, mail);
+                        pst.setString(5, idconf);
+                        pst.executeUpdate();
+                        JOptionPane.showMessageDialog(null, "client Modifié !!");
+                        Actualiser();
+                        inputClient.setText("");
+                        inputClient.requestFocus();
+
+                    }
+                    catch (SQLException e1)
+                    {
+                        e1.printStackTrace();
+                    }
+                }
+            }
+        });
+    }
+
+
+
+
+
+    //================================================================================
+
+
+
+
     //------------------------------- verification tous les champs ----------------------------
     public boolean ChampEstVide(String...champs)
     {
@@ -160,6 +326,7 @@ public class Client {
         }
         return b;
     }
+
     //-------------------- mail unique et chargement -------------------
     public boolean MailEstUnique(String inputMail)
     {
@@ -222,75 +389,7 @@ public class Client {
         }
         return true ;
     }
-    //----------------------- Rechercher et afficher ------------------------
-    public void Rechercher()
-    {
-        rechBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String rech = inputClient.getText().trim();
-                if(rech.equals(""))
-                {
-                    Actualiser();
-                }
-                else
-                {
-                    try
-                    {
-                        pst = con.prepareStatement("select idclient,nom,prenom,adresse,mail from client where idclient like '"+rech+"%' or nom like '"+rech+"%'" +
-                                "or prenom like '"+rech+"%' or adresse like '"+rech+"%'");
-                        ResultSet rs = pst.executeQuery();
-                        table1.setModel(DbUtils.resultSetToTableModel(rs));
 
-                        //System.out.println(table1.getRowCount());
-
-                        if(table1.getRowCount() == 0)
-                        {
-                            JOptionPane.showMessageDialog(null, "Non Trouvé");
-                        }
-
-                    }
-                    catch (SQLException ex)
-                    {
-                        ex.printStackTrace();
-                    }
-                }
-            }
-        });
-    }
-    //---------------------SUPPRIMER CLIENT----------------------------------
-    public void Supprimer()
-    {
-        suppBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String id=inputClient.getText();
-                if(ChampsIdEstInt(id)==false || IdExist(id)==false)
-                {
-                    JOptionPane.showMessageDialog(null, "Impossible De Supprimer");
-                    inputClient.setText("");
-                    inputClient.requestFocus();
-                }
-                else
-                {
-                    try
-                    {
-                        pst = con.prepareStatement("delete from client where idclient = ?");
-                        pst.setString(1, id);
-                        pst.executeUpdate();
-                        JOptionPane.showMessageDialog(null, "client Supprimé !!");
-                        Actualiser();
-                        inputClient.setText("");
-                        inputClient.requestFocus();
-                    }
-                    catch (SQLException e1)
-                    {
-                        e1.printStackTrace();
-                    }
-                }
-            }
-        });
-    }
     //----------------------------id chiffres-----------------------------
     public boolean ChampsIdEstInt(String champsId)
     {
@@ -306,6 +405,7 @@ public class Client {
         }
         return b;
     }
+
     //--------------------------id exist---------------------------------
     public boolean IdExist(String id)
     {
@@ -337,95 +437,14 @@ public class Client {
         }
         return false;
     }
-    //-----------------UPDATE CLIENT-------------------------------
-    public void Modifier()
-    {
-        modifBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String id=inputClient.getText();
-                if(ChampsIdEstInt(id)==false || IdExist(id)==false)
-                {
-                    JOptionPane.showMessageDialog(null, "Impossible De Modifier (id invalide)");
-                    inputClient.setText("");
-                    inputClient.requestFocus();
-                }
-                else
-                {
-                    try
-                    {
-                        pst = con.prepareStatement("select nom,prenom,adresse,mail from client where idclient = "+id+";");
-                        ResultSet rs = pst.executeQuery();
 
-                        while(rs.next())
-                        {
-                            nomclient.setText(rs.getString("nom"));
-                            prenomclient.setText(rs.getString("prenom"));
-                            adresseclient.setText(rs.getString("adresse"));
-                            mailclient.setText(rs.getString("mail"));
-
-                        }
-                    }
-                    catch (SQLException e1)
-                    {
-                        e1.printStackTrace();
-                    }
-                }
-            }
-        });
-    }
-    //------------------ Confirmer Modification ------------------------
-    public void Confirme()
-    {
-        confBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-
-                String nom,prenom,adresse,mail, idconf;
-                idconf = inputClient.getText().trim();
-                nom = nomclient.getText().trim();
-                prenom = prenomclient.getText().trim();
-                adresse = adresseclient.getText().trim();
-                mail = mailclient.getText().trim();
-
-
-                if(ChampEstVide(nom, prenom, adresse, mail))
-                {
-                    JOptionPane.showMessageDialog(null, "Verifiez Les Champs !!");
-                    nomclient.requestFocus();
-                }
-                else
-                {
-                    try
-                    {
-                        pst = con.prepareStatement("update client set nom = ? , prenom = ? , adresse = ? , mail = ?  where idclient = ? ");
-
-                        pst.setString(1, nom);
-                        pst.setString(2, prenom);
-                        pst.setString(3, adresse);
-                        pst.setString(4, mail);
-                        pst.setString(5, idconf);
-                        pst.executeUpdate();
-                        JOptionPane.showMessageDialog(null, "client Modifié !!");
-                        Actualiser();
-                        inputClient.setText("");
-                        inputClient.requestFocus();
-
-                    }
-                    catch (SQLException e1)
-                    {
-                        e1.printStackTrace();
-                    }
-                }
-            }
-        });
-    }
     //-------------- set current user -------------------
     public void setCurrentUser(String currentUser)
     {
         System.out.println(currentUser);
         this.currentUser.setText(currentUser);
     }
+
     //------------ retour -------------
     public void RetourMainListChoix(String user)
     {
@@ -437,4 +456,5 @@ public class Client {
             }
         });
     }
+    //
 }

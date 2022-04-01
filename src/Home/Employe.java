@@ -29,7 +29,7 @@ public class Employe {
 
 
     Connection con;
-    PreparedStatement pst;
+    PreparedStatement pst,pst1;
     JFrame frameEmp;
 
 
@@ -226,20 +226,66 @@ public class Employe {
                 }
                 else
                 {
+                    //if deleting an admin it should require an auth of that specific admin (simplier)
+                    //defaut : admin should authentify at least once before getting deleted
                     try
                     {
-                        pst = con.prepareStatement("delete from employe where idemp = ?");
-                        pst.setString(1, id);
-                        pst.executeUpdate();
-                        JOptionPane.showMessageDialog(null, "Employé Supprimé !!");
-                        Actualiser();
-                        inputEmp.setText("");
-                        inputEmp.requestFocus();
+                        pst1 = con.prepareStatement("select idemp, password, post , nom from employe where idemp = "+id+";");
+                        ResultSet rs1 = pst1.executeQuery();
+
+                        while(rs1.next())
+                        {
+                            if(rs1.getString("post").equals("ADMIN"))
+                            {
+                                String mdp;
+                                JOptionPane.showMessageDialog(null, "Suppression d'un Admin exige son mot de passe !!");
+                                mdp = JOptionPane.showInputDialog(null,"mot de passe de l'Admin à supprimer :");
+                                if((rs1.getString("idemp").equals(id) && crypte(mdp.trim()).equals(rs1.getString("password"))))
+                                {
+                                    try
+                                    {
+                                        pst = con.prepareStatement("delete from employe where idemp = ?");
+                                        pst.setString(1, id);
+                                        pst.executeUpdate();
+                                        JOptionPane.showMessageDialog(null, "Admin Supprimé !!");
+                                        Actualiser();
+                                        inputEmp.setText("");
+                                        inputEmp.requestFocus();
+                                    }
+                                    catch (SQLException e1)
+                                    {
+                                        e1.printStackTrace();
+                                    }
+                                }
+                                else
+                                {
+                                    JOptionPane.showMessageDialog(null, "Impossible De Supprimer");
+                                }
+                            }
+                            else
+                            {
+                                try
+                                {
+                                    pst = con.prepareStatement("delete from employe where idemp = ?");
+                                    pst.setString(1, id);
+                                    pst.executeUpdate();
+                                    JOptionPane.showMessageDialog(null, "Employé Supprimé !!");
+                                    Actualiser();
+                                    inputEmp.setText("");
+                                    inputEmp.requestFocus();
+                                }
+                                catch (SQLException e1)
+                                {
+                                    e1.printStackTrace();
+                                }
+                            }
+                        }
                     }
-                    catch (SQLException e1)
+                    catch (SQLException ex)
                     {
-                        e1.printStackTrace();
+                        ex.printStackTrace();
                     }
+
                 }
             }
         });
@@ -375,6 +421,7 @@ public class Employe {
 
 
     //================================================================================
+
 
     //----------------------------id chiffres-----------------------------
     public boolean ChampsIdEstInt(String champsId)
@@ -598,4 +645,6 @@ public class Employe {
     public void setCurrentUser(String currentUser) {
         this.currentUser.setText(currentUser);
     }
+//
+
 }
